@@ -1,0 +1,14 @@
+﻿@model Sosyal_Kutuphane.Models.Review
+
+<h2>Edit Review</h2>
+
+<form method="post" action="/Activity/EditReview">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="reviewId" value="@Model.Id" />
+
+    <label>Review Content</label>
+    <textarea name="content" class="form-control" rows="5">@Model.Content</textarea>
+
+    <button type="submit" class="btn btn-primary mt-2">Save</button>
+</form>

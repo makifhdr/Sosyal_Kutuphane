@@ -1,0 +1,30 @@
+﻿@{
+ViewData["Title"] = "Search";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Search Movies or Books</h2>
+
+    <form method="post" asp-controller="Search" asp-action="Results">
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <input class="form-control" name="query" placeholder="Search a movie or book..." required />
+            </div>
+
+            <div class="col-md-2">
+                <select class="form-select" name="type">
+                    <option value="movie">Movie</option>
+                    <option value="book">Book</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100">Search</button>
+            </div>
+        </div>
+
+        <p class="text-danger">@ViewBag.Error</p>
+    </form>
+
+</div>

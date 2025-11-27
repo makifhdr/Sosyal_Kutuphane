@@ -1,0 +1,199 @@
+﻿@using Sosyal_Kutuphane.Data
+@model Newtonsoft.Json.Linq.JObject
+@inject ApplicationDbContext _db
+
+@{
+    var durationMinutes = (int)@Model["runtime"];
+    var durationString = durationMinutes/60 + " hours and " + durationMinutes%60 + " minutes";
+    
+    string mediaId = Model["id"]?.ToString() ?? "";
+    string mediaType = "movie";
+
+}
+
+<h1>@Model["title"]</h1>
+<p>@Model["overview"]</p>
+<p><strong>Release Year:</strong> @Model["release_date"]</p>
+<p><strong>Duration:</strong> @durationString</p>
+<p>
+    <strong>Genres:</strong>
+    @string.Join(", ", @Model["genres"].Select(g => g["name"].ToString()))
+</p>
+
+<h3>Director</h3>
+@Model["credits"]?["crew"]!.FirstOrDefault(c => (string)c["job"]! == "Director")?["name"]
+
+@{
+    var model1 = (Model["credits"]?["cast"]!).Take(5);
+    if (model1.ToList().Count != 0)
+    {
+        <h3>Actors</h3>
+        <ul>
+            @{
+                foreach (var a in model1)
+                {
+                    <li>@a["name"] as @a["character"]</li>
+                }
+            }
+        </ul>
+    }
+    else
+    {
+        <h3></h3>
+    }
+}
+
+
+@{
+    var poster = $"https://image.tmdb.org/t/p/w500{Model["poster_path"]}";
+}
+<img src="@poster" width="300" alt=""/>
+
+<!-- Library Buttons -->
+@{
+    int? userId = User.Identity.IsAuthenticated
+        ? int.Parse(User.FindFirst("UserId").Value)
+        : null;
+
+    var userMedia = userId != null
+        ? _db.UserMedia.FirstOrDefault(um => um.UserId == userId && um.MediaId == mediaId && um.MediaType == mediaType)
+        : null;
+
+    var myLists = userId != null
+        ? _db.CustomList.Where(c => c.UserId == userId).ToList()
+        : new List<Sosyal_Kutuphane.Models.CustomList>();
+}
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div>
+                    <!-- Watched -->
+                    @if (userMedia != null && userMedia.Status == "watched")
+                    {
+                        <form method="post" asp-controller="Media" asp-action="RemoveFromLibrary" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="mediaId" value="@mediaId" />
+                            <input type="hidden" name="mediaType" value="@mediaType" />
+                            <button class="btn btn-danger">Remove from Watched</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-controller="Media" asp-action="AddToLibrary" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="mediaId" value="@mediaId" />
+                            <input type="hidden" name="mediaType" value="@mediaType" />
+                            <input type="hidden" name="status" value="watched" />
+                            <button class="btn btn-success">Mark as Watched</button>
+                        </form>
+                    }
+
+                    <!-- To Watch -->
+                    @if (userMedia != null && userMedia.Status == "towatch")
+                    {
+                        <form method="post" asp-controller="Media" asp-action="RemoveFromLibrary" class="d-inline ms-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="mediaId" value="@mediaId" />
+                            <input type="hidden" name="mediaType" value="@mediaType" />
+                            <button class="btn btn-outline-danger">Remove from To Watch</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-controller="Media" asp-action="AddToLibrary" class="d-inline ms-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="mediaId" value="@mediaId" />
+                            <input type="hidden" name="mediaType" value="@mediaType" />
+                            <input type="hidden" name="status" value="towatch" />
+                            <button class="btn btn-outline-primary">Add to To Watch</button>
+                        </form>
+                    }
+                </div>
+
+                <!-- Custom List Add -->
+                <div class="mt-3">
+                    <form method="post" asp-controller="Media" asp-action="AddToCustomList" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="mediaId" value="@mediaId" />
+                        <input type="hidden" name="mediaType" value="@mediaType" />
+
+                        <select name="listId" class="form-select d-inline w-auto">
+                            <option value="">Add to custom list...</option>
+                            @foreach (var list in myLists)
+                            {
+                                <option value="@list.Id">@list.Name</option>
+                            }
+                        </select>
+
+                        <button class="btn btn-outline-secondary ms-2">Add</button>
+                    </form>
+                </div>
+            }
+
+<form method="post" action="/Activity/Rate">
+    <input type="hidden" name="mediaId" value="@Model["id"]" />
+    <input type="hidden" name="mediaType" value="movie" /> <!-- book için "book" -->
+    
+    <label><strong>Your Rating (1–10):</strong></label>
+    <input type="number" name="score" min="1" max="10" class="form-control w-25" required />
+
+    <button class="btn btn-primary mt-2">Submit Rating</button>
+</form>
+
+<form method="post" action="/Activity/AddReview" class="mt-4">
+    <input type="hidden" name="mediaId" value="@Model["id"]" />
+    <input type="hidden" name="mediaType" value="movie" /> <!-- veya book -->
+
+    <label><strong>Your Review:</strong></label>
+    <textarea name="content" class="form-control" rows="3" required></textarea>
+
+    <button class="btn btn-success mt-2">Send Review</button>
+</form>
+        
+<h3 class="mt-5">User Reviews</h3>
+        
+@using Microsoft.EntityFrameworkCore
+@{
+    var reviews = _db.Reviews
+        .Where(r => r.MediaId == mediaId && r.MediaType == mediaType)
+        .Include(r => r.User)
+        .OrderByDescending(r => r.CreatedAt)
+        .ToList();
+}
+
+@foreach (var rev in reviews)
+{
+    <div class="card mt-3">
+        <div class="card-body">
+
+            <a asp-controller="Profile"
+               asp-action="Index"
+               asp-route-id="@rev.UserId"
+               style="text-decoration:none;">
+                <strong>@rev.User.UserName</strong>
+            </a>
+            <p>@rev.Content</p>
+            
+            <small class="text-muted">
+                Posted @rev.CreatedAt.ToLocalTime().ToString("g")
+            </small>
+
+            <form method="post" action="/Activity/ToggleLike">
+                <input type="hidden" name="reviewId" value="@rev.Id" />
+                <button class="btn btn-outline-primary">
+                    ❤️ Like (@_db.Likes.Count(l => l.ReviewId == rev.Id))
+                </button>
+            </form>
+            
+            @if (User.Identity.IsAuthenticated && 
+                 int.Parse(User.FindFirst("UserId")!.Value) == rev.UserId)
+            {
+                <form method="post" action="/Activity/DeleteReview" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="reviewId" value="@rev.Id" />
+                    <button class="btn btn-sm btn-danger">Delete</button>
+                </form>
+            }
+
+        </div>
+    </div>
+}

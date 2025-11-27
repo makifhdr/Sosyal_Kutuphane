@@ -1,0 +1,62 @@
+﻿@using Sosyal_Kutuphane.Services
+@model Sosyal_Kutuphane.Models.CustomList
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container mt-4">
+    <h2>@Model.Name</h2>
+
+    <a class="btn btn-secondary mb-3" asp-controller="Profile" asp-action="Index">Back to Profile</a>
+    
+    @inject GoogleBooksService gbooks;
+    @inject TmdbService tmdb;
+    
+    
+    @if (Model.Items == null || !Model.Items.Any())
+    {
+        <p class="text-muted">This list is empty.</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in Model.Items)
+            {
+                
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            @{
+                                switch (item.MediaType)
+                                {
+                                    case "movie":
+                                    {
+                                        var itemName = await tmdb.GetMovieTitle(item.MediaId);
+                                        <p class="card-text">@itemName - Movie</p>
+                                        break;
+                                    }
+                                    case "book":
+                                    {
+                                        var itemName = await gbooks.GetBookTitle(item.MediaId);
+                                        <p class="card-text">@itemName - Book</p>
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            
+
+                            <form method="post" asp-controller="CustomList" asp-action="RemoveItem">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="listId" value="@Model.Id"/>
+                                <input type="hidden" name="itemId" value="@item.Id"/>
+                                <button class="btn btn-sm btn-danger">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
