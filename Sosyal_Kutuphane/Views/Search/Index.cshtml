@@ -1,30 +1,120 @@
-﻿@{
-ViewData["Title"] = "Search";
-}
+﻿@model Sosyal_Kutuphane.Models.ViewModels.ExploreViewModel
 
 <div class="container mt-4">
 
-    <h2 class="mb-4">Search Movies or Books</h2>
+    <h1>Search</h1>
 
-    <form method="post" asp-controller="Search" asp-action="Results">
-        <div class="row mb-3">
-            <div class="col-md-8">
-                <input class="form-control" name="query" placeholder="Search a movie or book..." required />
-            </div>
+    <!-- UNIFIED SEARCH + ADVANCED FILTER FORM -->
+    <form method="get" asp-controller="Search" asp-action="AdvancedSearch" class="row g-3 mb-5">
 
-            <div class="col-md-2">
-                <select class="form-select" name="type">
-                    <option value="movie">Movie</option>
-                    <option value="book">Book</option>
-                </select>
-            </div>
-
-            <div class="col-md-2">
-                <button class="btn btn-primary w-100">Search</button>
-            </div>
+        <!-- QUERY -->
+        <div class="col-md-6">
+            <label class="form-label">Search</label>
+            <input type="text" name="query" class="form-control" placeholder="Search for movies or books..." required />
         </div>
 
-        <p class="text-danger">@ViewBag.Error</p>
+        <!-- TYPE -->
+        <div class="col-md-3">
+            <label class="form-label">Type</label>
+            <select name="type" class="form-select">
+                <option value="movie">Movies</option>
+                <option value="book">Books</option>
+            </select>
+        </div>
+
+        <!-- GENRE (Movies Only) -->
+        <div class="col-md-3">
+            <label class="form-label">Genre</label>
+            <select name="genre" class="form-select">
+                <option value="">Any</option>
+                <option value="28">Action</option>
+                <option value="12">Adventure</option>
+                <option value="16">Animation</option>
+                <option value="35">Comedy</option>
+                <option value="80">Crime</option>
+                <option value="18">Drama</option>
+                <option value="14">Fantasy</option>
+                <option value="27">Horror</option>
+                <option value="10749">Romance</option>
+                <option value="878">Sci-Fi</option>
+            </select>
+        </div>
+
+        <!-- YEAR -->
+        <div class="col-md-3">
+            <label class="form-label">Year</label>
+            <input type="number" name="year" class="form-control" min="1900" max="2100" />
+        </div>
+
+        <!-- MIN RATING -->
+        <div class="col-md-3">
+            <label class="form-label">Min Rating</label>
+            <select name="minRating" class="form-select">
+                <option value="">Any</option>
+                <option value="2">2+</option>
+                <option value="4">4+</option>
+                <option value="6">6+</option>
+                <option value="7">7+</option>
+                <option value="8">8+</option>
+            </select>
+        </div>
+
+        <!-- BUTTON -->
+        <div class="col-md-3 d-flex align-items-end">
+            <button class="btn btn-success w-100">Search & Apply Filters</button>
+        </div>
     </form>
+
+    <hr />
+
+    <!-- TOP RATED -->
+    <h2 class="mt-5">Top Rated</h2>
+    <div class="row mt-3">
+        @foreach (var item in Model.TopRated)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm h-100">
+                    <img src="@item.PosterUrl" class="card-img-top" />
+
+                    <div class="card-body">
+                        <strong>@item.Title (@(item.MediaType == "book" ? "Book" : "Movie"))</strong><br />
+                        <small>⭐ @item.AverageRating/10 (@item.RatingCount ratings)</small>
+                    </div>
+
+                    <div class="card-footer bg-white border-0">
+                        <a class="btn btn-primary w-100"
+                           href="/Media/@(item.MediaType == "movie" ? "MovieDetails" : "BookDetails")/@item.MediaId">
+                            Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- MOST POPULAR -->
+    <h2 class="mt-5">Most Popular</h2>
+    <div class="row mt-3">
+        @foreach (var item in Model.MostPopular)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm h-100">
+                    <img src="@item.PosterUrl" class="card-img-top" />
+
+                    <div class="card-body">
+                        <strong>@item.Title</strong><br />
+                        <small>🔥 Popularity: @item.PopularityScore</small>
+                    </div>
+
+                    <div class="card-footer bg-white border-0">
+                        <a class="btn btn-outline-primary w-100"
+                           href="/Media/@(item.MediaType == "movie" ? "MovieDetails" : "BookDetails")/@item.MediaId">
+                            View
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 
 </div>

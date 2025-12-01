@@ -2,7 +2,6 @@
 using Sosyal_Kutuphane.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Sosyal_Kutuphane.Models;
 using Sosyal_Kutuphane.Services;
 
@@ -13,14 +12,14 @@ public class ProfileController : Controller
 {
     private readonly ApplicationDbContext _db;
     
-    private readonly TmdbService tmdb;
-    private readonly GoogleBooksService gbooks;
+    private readonly TmdbService _tmdb;
+    private readonly GoogleBooksService _gbooks;
 
     public ProfileController(ApplicationDbContext db,TmdbService tmdb, GoogleBooksService gbooks)
     {
         _db = db;
-        this.tmdb = tmdb;
-        this.gbooks = gbooks;
+        _tmdb = tmdb;
+        _gbooks = gbooks;
     }
 
     public async Task<IActionResult> Index(int? id)
@@ -64,8 +63,8 @@ public class ProfileController : Controller
         ViewBag.RecentRatings = await Task.WhenAll(ratings.Select(async x =>
         {
             string title = x.MediaType == "movie"
-                ? await tmdb.GetMovieTitle(x.MediaId)
-                : await gbooks.GetBookTitle(x.MediaId);
+                ? await _tmdb.GetMovieTitle(x.MediaId)
+                : await _gbooks.GetBookTitle(x.MediaId);
 
             return new
             {
@@ -73,6 +72,7 @@ public class ProfileController : Controller
                 x.Score,
                 x.MediaType,
                 x.CreatedAt,
+                x.MediaId,
                 Title = title
             };
         }));
@@ -80,8 +80,8 @@ public class ProfileController : Controller
         ViewBag.RecentReviews = await Task.WhenAll(reviews.Select(async x =>
         {
             string title = x.MediaType == "movie"
-                ? await tmdb.GetMovieTitle(x.MediaId)
-                : await gbooks.GetBookTitle(x.MediaId);
+                ? await _tmdb.GetMovieTitle(x.MediaId)
+                : await _gbooks.GetBookTitle(x.MediaId);
 
             return new
             {
@@ -89,6 +89,7 @@ public class ProfileController : Controller
                 x.Content,
                 x.MediaType,
                 x.CreatedAt,
+                x.MediaId,
                 Title = title
             };
         }));
@@ -167,7 +168,7 @@ public class ProfileController : Controller
         if (targetUser == null)
         {
             TempData["Error"] = "User not found!";
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Feed", "Activity");
         }
         
         // Giriş yapan kullanıcıyı al

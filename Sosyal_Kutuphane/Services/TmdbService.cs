@@ -19,7 +19,7 @@ public class TmdbService
         return JObject.Parse(json);
     }
 
-    public async Task<JObject> GetMovieDetails(int movieId)
+    public async Task<JObject> GetMovieDetails(string movieId)
     {
         var url = $"https://api.themoviedb.org/3/movie/{movieId}?api_key={_apiKey}&append_to_response=credits";
         var json = await _http.GetStringAsync(url);
@@ -44,5 +44,18 @@ public class TmdbService
         {
             return "Unknown Title";
         }
+    }
+    
+    public async Task<Dictionary<int, string>> GetMovieGenres()
+    {
+        var url = $"https://api.themoviedb.org/3/genre/movie/list?api_key={_apiKey}";
+        var json = await _http.GetStringAsync(url);
+        var obj = JObject.Parse(json);
+
+        return obj["genres"]
+            .ToDictionary(
+                g => (int)g["id"],
+                g => g["name"].ToString()
+            );
     }
 }

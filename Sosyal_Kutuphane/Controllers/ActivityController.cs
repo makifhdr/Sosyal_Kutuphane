@@ -1,17 +1,26 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using Sosyal_Kutuphane.Data;
 using Sosyal_Kutuphane.Models;
+using Sosyal_Kutuphane.Models.ViewModels;
+using Sosyal_Kutuphane.Services;
 
 namespace Sosyal_Kutuphane.Controllers;
 
 public class ActivityController : Controller
 {
     private readonly ApplicationDbContext _db;
+    
+    private readonly TmdbService _tmdb;
+    private readonly GoogleBooksService _books;
 
-    public ActivityController(ApplicationDbContext db)
+    public ActivityController(ApplicationDbContext db, TmdbService tmdb, GoogleBooksService books)
     {
         _db = db;
+        _tmdb = tmdb;
+        _books = books;
     }
     
     [HttpPost]
@@ -37,24 +46,79 @@ public class ActivityController : Controller
     }
     
     [HttpPost]
-    public IActionResult ToggleLike(int reviewId)
+    public IActionResult ToggleLike(int? ratingId, int? reviewId)
     {
-        var userId = int.Parse(User.FindFirst("UserId")!.Value);
+        var userId = int.Parse(User.FindFirst("UserId").Value);
 
-        var existing = _db.Likes.SingleOrDefault(l => l.UserId == userId && l.ReviewId == reviewId);
+        var existing = _db.ActivityLike
+            .FirstOrDefault(l => l.UserId == userId 
+                                 && l.RatingId == ratingId 
+                                 && l.ReviewId == reviewId);
 
-        if (existing == null)
+        if (existing != null)
         {
-            _db.Likes.Add(new Like { UserId = userId, ReviewId = reviewId });
+            _db.ActivityLike.Remove(existing);
         }
         else
         {
-            _db.Likes.Remove(existing);
+            _db.ActivityLike.Add(new ActivityLike
+            {
+                UserId = userId,
+                RatingId = ratingId,
+                ReviewId = reviewId
+            });
         }
 
         _db.SaveChanges();
+        return Redirect(Request.Headers["Referer"]);
+    }
+    
+    [HttpGet]
+    public IActionResult AddComment(int activityId, string activityType)
+    {
+        // Basit doğrulama
+        if (activityType != "rating" && activityType != "review")
+            return BadRequest("Invalid activity type.");
 
-        return Redirect(Request.Headers["Referer"].ToString());
+        var vm = new ActivityCommentViewModel
+        {
+            ActivityId = activityId,
+            ActivityType = activityType
+        };
+
+        return View(vm);
+    }
+
+    // POST: formu işler
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult AddComment(ActivityCommentViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var userId = int.Parse(User.FindFirst("UserId").Value);
+
+        var comment = new ActivityComment
+        {
+            UserId = userId,
+            Content = model.Content,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        if (model.ActivityType == "rating")
+            comment.RatingId = model.ActivityId;
+        else if (model.ActivityType == "review")
+            comment.ReviewId = model.ActivityId;
+        else
+            return BadRequest("Invalid activity type.");
+
+        _db.ActivityComment.Add(comment);
+        _db.SaveChanges();
+
+        return RedirectToAction("Feed", "Activity");
     }
     
     [HttpPost]
@@ -110,49 +174,228 @@ public class ActivityController : Controller
     }
     
     [Authorize]
-    [HttpGet]
-    public IActionResult EditReview(int reviewId)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult DeleteComment(int id)
     {
-        var userId = int.Parse(User.FindFirst("UserId")!.Value);
+        var userId = int.Parse(User.FindFirst("UserId").Value);
 
-        var review = _db.Reviews.SingleOrDefault(r => r.Id == reviewId);
+        var comment = _db.ActivityComment.FirstOrDefault(c => c.Id == id);
 
-        if (review == null)
+        if (comment == null)
             return NotFound();
 
-        if (review.UserId != userId)
+        if (comment.UserId != userId)
             return Forbid();
 
-        return View(review); // Views/Activity/EditReview.cshtml
+        _db.ActivityComment.Remove(comment);
+        _db.SaveChanges();
+
+        return Redirect(Request.Headers["Referer"].ToString());
     }
     
     [Authorize]
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult EditReview(int reviewId, string content)
+    public async Task<IActionResult> Feed(int page = 1, int pageSize = 15)
     {
-        var userId = int.Parse(User.FindFirst("UserId")!.Value);
+        var currentUserId = int.Parse(User.FindFirst("UserId").Value);
 
-        var review = _db.Reviews.SingleOrDefault(r => r.Id == reviewId);
+        // 1) Takip edilen kullanıcıların id'leri
+        var followingIds = await _db.Follow
+            .Where(f => f.FollowerId == currentUserId)
+            .Select(f => f.FollowingId)
+            .ToListAsync();
 
-        if (review == null)
-            return NotFound();
-
-        if (review.UserId != userId)
-            return Forbid();
-
-        review.Content = content;
-        _db.SaveChanges();
-
-
-        switch (review.MediaType)
+        if (!followingIds.Any())
         {
-            case "movie":
-                return RedirectToAction("MovieDetails", "Media", new { id = review.MediaId });
-            case "book":
-                return RedirectToAction("BookDetails", "Media", new { id = review.MediaId });
+            // Takip edilen yoksa boş liste döndür
+            return View(new List<ActivityViewModel>());
         }
 
-        return RedirectToAction("Index", "Home");
+        // 2) Ratings ve Reviews'leri ayrı ayrı çek (User nav ile)
+        var ratingsList = await _db.Ratings
+            .Where(r => followingIds.Contains(r.UserId))
+            .Include(r => r.User)   // navigation olmalı
+            .OrderByDescending(r => r.CreatedAt)
+            .ToListAsync();
+
+        var reviewsList = await _db.Reviews
+            .Where(rv => followingIds.Contains(rv.UserId))
+            .Include(rv => rv.User)
+            .OrderByDescending(rv => rv.CreatedAt)
+            .ToListAsync();
+
+        // 3) Like sayıları ( Ratings ve Reviews için ) — grouped sorgu
+        var ratingIds = ratingsList.Select(r => r.Id).ToList();
+        var reviewIds = reviewsList.Select(rv => rv.Id).ToList();
+
+        var likesForRatings = await _db.ActivityLike
+            .Where(l => l.RatingId != null && ratingIds.Contains(l.RatingId.Value))
+            .GroupBy(l => l.RatingId.Value)
+            .Select(g => new { RatingId = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        var likesForReviews = await _db.ActivityLike
+            .Where(l => l.ReviewId != null && reviewIds.Contains(l.ReviewId.Value))
+            .GroupBy(l => l.ReviewId.Value)
+            .Select(g => new { ReviewId = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        var likeCountByRating = likesForRatings.ToDictionary(x => x.RatingId, x => x.Count);
+        var likeCountByReview = likesForReviews.ToDictionary(x => x.ReviewId, x => x.Count);
+
+        // 4) Tüm benzersiz (mediaType, mediaId) çiftlerini topla -> tekil fetch
+        var mediaKeys = ratingsList
+            .Select(r => (r.MediaType, r.MediaId))
+            .Concat(reviewsList.Select(rv => (rv.MediaType, rv.MediaId)))
+            .Distinct()
+            .ToList();
+
+        // 5) Media meta bilgilerini çek (başlık + poster) — cache dictionary
+        var mediaMeta = new Dictionary<(string mediaType, string mediaId), (string title, string posterUrl)>();
+
+        foreach (var (mediaType, mediaId) in mediaKeys)
+        {
+            try
+            {
+                if (mediaType == "movie")
+                {
+                    // tmdb servisinden detay al
+                    var movie = await _tmdb.GetMovieDetails(mediaId);
+                    var title = movie["title"]?.ToString() ?? "Unknown movie";
+                    var poster = movie["poster_path"] != null
+                        ? $"https://image.tmdb.org/t/p/w500{movie["poster_path"]}"
+                        : "/images/no-poster.png";
+                    
+                    mediaMeta[(mediaType, mediaId)] = (title, poster);
+                }
+                else // book
+                {
+                    JObject book = await _books.GetBookDetails(mediaId);
+                    var title = book["volumeInfo"]?["title"]?.ToString() ?? "Unknown book";
+                    var poster = book["volumeInfo"]?["imageLinks"]?["thumbnail"]?.ToString() ?? "/images/no-cover.png";
+                    
+                    mediaMeta[(mediaType, mediaId)] = (title, poster);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Servis hata verirse fallback değer ata (hata loglamayı unutma)
+                Console.WriteLine(ex.Message);
+                mediaMeta[(mediaType, mediaId)] = ("Unknown title", "/images/no-cover.png");
+            }
+        }
+        
+        
+
+        // 6) ActivityViewModel listesi oluştur
+        var activities = new List<ActivityViewModel>();
+
+        foreach (var r in ratingsList)
+        {
+            mediaMeta.TryGetValue((r.MediaType, r.MediaId), out var meta);
+            
+            var userId = int.Parse(User.FindFirst("UserId").Value);
+            
+            var liked = _db.ActivityLike.Any(l =>
+                l.UserId == userId &&
+                (l.RatingId == r.Id ||
+                 l.ReviewId == r.Id)
+            );
+            
+            
+            
+            activities.Add(new ActivityViewModel
+            {
+                ActivityId = r.Id,
+                UserId = r.UserId,
+                UserName = r.User?.UserName ?? "Unknown",
+                Avatar = r.User?.Avatar,
+                MediaId = r.MediaId,
+                MediaType = r.MediaType,
+                MediaTitle = meta.title,
+                MediaPosterUrl = meta.posterUrl,
+                ActivityType = "rating",
+                RatingScore = r.Score,
+                CreatedAt = r.CreatedAt,
+                LikeCount = likeCountByRating.ContainsKey(r.Id) ? likeCountByRating[r.Id] : 0,
+                CommentCount = _db.ActivityComment.Count(c => c.RatingId == r.Id),
+                Comments = _db.ActivityComment
+                    .Where(c => c.RatingId == r.Id)
+                    .Select(c => new ActivityCommentDto
+                    {
+                        Id = c.Id,
+                        UserId = c.UserId,
+                        UserName = c.User.UserName,
+                        Avatar = c.User.Avatar,
+                        Content = c.Content,
+                        CreatedAt = c.CreatedAt
+                    }).ToList(),
+                IsLiked = liked
+            });
+        }
+
+        foreach (var rv in reviewsList)
+        {
+            
+            mediaMeta.TryGetValue((rv.MediaType, rv.MediaId), out var meta);
+            
+            var userId = int.Parse(User.FindFirst("UserId").Value);
+            
+            var liked = _db.ActivityLike.Any(l =>
+                l.UserId == userId &&
+                (l.RatingId == rv.Id ||
+                 l.ReviewId == rv.Id)
+            );
+            
+            activities.Add(new ActivityViewModel
+            {
+                ActivityId = rv.Id,
+                UserId = rv.UserId,
+                UserName = rv.User?.UserName ?? "Unknown",
+                Avatar = rv.User?.Avatar,
+                MediaId = rv.MediaId,
+                MediaType = rv.MediaType,
+                MediaTitle = meta.title,
+                MediaPosterUrl = meta.posterUrl,
+                ActivityType = "review",
+                ReviewExcerpt = rv.Content?.Length > 200 ? rv.Content.Substring(0, 200) + "..." : rv.Content,
+                FullReview = rv.Content,
+                CreatedAt = rv.CreatedAt,
+                LikeCount = likeCountByReview.ContainsKey(rv.Id) ? likeCountByReview[rv.Id] : 0,
+                CommentCount = _db.ActivityComment.Count(c => c.ReviewId == rv.Id),
+                Comments = _db.ActivityComment
+                    .Where(c => c.ReviewId == rv.Id)
+                    .Select(c => new ActivityCommentDto
+                    {
+                        Id = c.Id,
+                        UserId = c.UserId,
+                        UserName = c.User.UserName,
+                        Avatar = c.User.Avatar,
+                        Content = c.Content,
+                        CreatedAt = c.CreatedAt
+                    }).ToList(),
+                IsLiked = liked
+            });
+        }
+
+        // 7) Birleştir, sırala, take limit uygula
+        var ordered = activities
+            .OrderByDescending(a => a.CreatedAt)
+            .ToList();
+        
+        var totalCount = activities.Count;
+        
+        var pagedActivities = ordered
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return View(new PagedFeedViewModel
+        {
+            Activities = pagedActivities,
+            CurrentPage = page,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        });
     }
 }

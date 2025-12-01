@@ -9,13 +9,14 @@ else
 {
     <div class="row">
             
-            @inject GoogleBooksService gbooks;
-            @inject TmdbService tmdb;
+            @inject GoogleBooksService Gbooks;
+            @inject TmdbService Tmdb;
 
             @foreach (var item in Model)
             {
                 <div class="col-md-3 mb-3">
-                    <div class="card">
+                    <div class="card shadow-sm">
+                        
 
                         <div class="card-body">
                             @{
@@ -23,17 +24,22 @@ else
                                 {
                                     case "movie":
                                     {
-                                        var itemName = await tmdb.GetMovieTitle(item.MediaId);
-                                        <p class="card-text">@itemName</p>
+                                        var itemName = await Tmdb.GetMovieTitle(item.MediaId);
+                                        <a  href="/Media/MovieDetails/@item.MediaId"
+                                            class="text-decoration-none">@itemName</a>
                                         break;
                                     }
                                     case "book":
                                     {
-                                        var itemName = await gbooks.GetBookTitle(item.MediaId);
-                                        <p class="card-text">@itemName</p>
+                                        var itemName = await Gbooks.GetBookTitle(item.MediaId);
+                                        <a href="/Media/BookDetails/@item.MediaId" 
+                                           class="text-decoration-none ">@itemName</a>
                                         break;
                                     }
                                 }
+                                <br/>
+                                var type = item.MediaType == "movie" ? "Movie" : "Book";
+                                <small class="text-muted">@type</small>
                             }
                         </div>
 

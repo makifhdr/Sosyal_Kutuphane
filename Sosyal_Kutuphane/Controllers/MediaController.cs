@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Sosyal_Kutuphane.Data;
 using Sosyal_Kutuphane.Models;
+using Sosyal_Kutuphane.Models.ViewModels;
 using Sosyal_Kutuphane.Services;
 
 namespace Sosyal_Kutuphane.Controllers;
@@ -21,7 +22,7 @@ public class MediaController : Controller
         _books = books;
     }
 
-    public async Task<IActionResult> MovieDetails(int id)
+    public async Task<IActionResult> MovieDetails(string id)
     {
         var movie = await _tmdb.GetMovieDetails(id);
         return View(movie);
@@ -38,99 +39,119 @@ public class MediaController : Controller
     } 
     
     
-[Authorize]
-[HttpPost]
-[ValidateAntiForgeryToken]
-public IActionResult AddToLibrary(string mediaId, string mediaType, string status)
-{
-    var userId = int.Parse(User.FindFirst("UserId").Value);
-
-    var valid = new[] { "watched", "towatch", "read", "toread" };
-    if (!valid.Contains(status)) return BadRequest();
-
-    var existing = _db.UserMedia
-        .FirstOrDefault(um => um.UserId == userId && um.MediaId == mediaId && um.MediaType == mediaType);
-
-    if (existing == null)
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult AddToLibrary(string mediaId, string mediaType, string status)
     {
-        _db.UserMedia.Add(new UserMedia
+        var userId = int.Parse(User.FindFirst("UserId").Value);
+
+        var valid = new[] { "watched", "towatch", "read", "toread" };
+        if (!valid.Contains(status)) return BadRequest();
+
+        var existing = _db.UserMedia
+            .FirstOrDefault(um => um.UserId == userId && um.MediaId == mediaId && um.MediaType == mediaType);
+
+        if (existing == null)
         {
-            UserId = userId,
-            MediaId = mediaId,
-            MediaType = mediaType,
-            Status = status
-        });
-    }
-    else
-    {
-        existing.Status = status;
-    }
-
-    _db.SaveChanges();
-    return Redirect(Request.Headers["Referer"].ToString());
-}
-
-[Authorize]
-[HttpPost]
-[ValidateAntiForgeryToken]
-public IActionResult RemoveFromLibrary(string mediaId, string mediaType)
-{
-    var userId = int.Parse(User.FindFirst("UserId").Value);
-
-    var existing = _db.UserMedia
-        .FirstOrDefault(um => um.UserId == userId && um.MediaId == mediaId && um.MediaType == mediaType);
-
-    if (existing != null)
-    {
-        _db.UserMedia.Remove(existing);
-        _db.SaveChanges();
-    }
-
-    return Redirect(Request.Headers["Referer"].ToString());
-}
-
-[Authorize]
-[HttpPost]
-[ValidateAntiForgeryToken]
-public IActionResult AddToCustomList(int listId, string mediaId, string mediaType)
-{
-    var userId = int.Parse(User.FindFirst("UserId").Value);
-    var list = _db.CustomList.FirstOrDefault(l => l.Id == listId && l.UserId == userId);
-    if (list == null) return Forbid();
-
-    var existing = _db.CustomListItem
-        .FirstOrDefault(i => i.CustomListId == listId && i.MediaId == mediaId && i.MediaType == mediaType);
-
-    if (existing == null)
-    {
-        _db.CustomListItem.Add(new CustomListItem
+            _db.UserMedia.Add(new UserMedia
+            {
+                UserId = userId,
+                MediaId = mediaId,
+                MediaType = mediaType,
+                Status = status
+            });
+        }
+        else
         {
-            CustomListId = listId,
-            MediaId = mediaId,
-            MediaType = mediaType
-        });
+            existing.Status = status;
+        }
+
         _db.SaveChanges();
+        return Redirect(Request.Headers["Referer"].ToString());
     }
 
-    return Redirect(Request.Headers["Referer"].ToString());
-}
-
-[Authorize]
-[HttpPost]
-[ValidateAntiForgeryToken]
-public IActionResult RemoveFromCustomList(int listId, string mediaId, string mediaType)
-{
-    var userId = int.Parse(User.FindFirst("UserId").Value);
-    var list = _db.CustomList.FirstOrDefault(l => l.Id == listId && l.UserId == userId);
-    if (list == null) return Forbid();
-
-    var item = _db.CustomListItem.FirstOrDefault(i => i.CustomListId == listId && i.MediaId == mediaId && i.MediaType == mediaType);
-    if (item != null)
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult RemoveFromLibrary(string mediaId, string mediaType)
     {
-        _db.CustomListItem.Remove(item);
-        _db.SaveChanges();
+        var userId = int.Parse(User.FindFirst("UserId").Value);
+
+        var existing = _db.UserMedia
+            .FirstOrDefault(um => um.UserId == userId && um.MediaId == mediaId && um.MediaType == mediaType);
+
+        if (existing != null)
+        {
+            _db.UserMedia.Remove(existing);
+            _db.SaveChanges();
+        }
+
+        return Redirect(Request.Headers["Referer"].ToString());
     }
 
-    return Redirect(Request.Headers["Referer"].ToString());
-}
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult AddToCustomList(int listId, string mediaId, string mediaType, string returnUrl)
+    {
+        var userId = int.Parse(User.FindFirst("UserId").Value);
+        var list = _db.CustomList.FirstOrDefault(l => l.Id == listId && l.UserId == userId);
+        if (list == null) return Forbid();
+
+        var existing = _db.CustomListItem
+            .FirstOrDefault(i => i.CustomListId == listId && i.MediaId == mediaId && i.MediaType == mediaType);
+
+        if (existing == null)
+        {
+            _db.CustomListItem.Add(new CustomListItem
+            {
+                CustomListId = listId,
+                MediaId = mediaId,
+                MediaType = mediaType
+            });
+            _db.SaveChanges();
+        }
+
+        return RedirectToAction("Details", "CustomList", new { id = listId });
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult RemoveFromCustomList(int listId, string mediaId, string mediaType)
+    {
+        var userId = int.Parse(User.FindFirst("UserId").Value);
+        var list = _db.CustomList.FirstOrDefault(l => l.Id == listId && l.UserId == userId);
+        if (list == null) return Forbid();
+
+        var item = _db.CustomListItem.FirstOrDefault(i => i.CustomListId == listId && i.MediaId == mediaId && i.MediaType == mediaType);
+        if (item != null)
+        {
+            _db.CustomListItem.Remove(item);
+            _db.SaveChanges();
+        }
+
+        return Redirect(Request.Headers["Referer"].ToString());
+    }
+    
+    [HttpGet]
+    public IActionResult AddToCustomListPage(string mediaId, string mediaType)
+    {
+        int userId = int.Parse(User.FindFirst("UserId").Value);
+
+        var lists = _db.CustomList
+            .Where(c => c.UserId == userId)
+            .ToList();
+
+        if (lists.Count == 0)
+        {
+            return RedirectToAction("CreateList", "Profile");
+        }
+
+        ViewBag.MediaId = mediaId;
+        ViewBag.MediaType = mediaType;
+
+        return View(lists);
+    }
 }

@@ -22,6 +22,72 @@ namespace Sosyal_Kutuphane.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Sosyal_Kutuphane.Models.ActivityComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("RatingId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ReviewId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RatingId");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ActivityComment");
+                });
+
+            modelBuilder.Entity("Sosyal_Kutuphane.Models.ActivityLike", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("RatingId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ReviewId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RatingId");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ActivityLike");
+                });
+
             modelBuilder.Entity("Sosyal_Kutuphane.Models.CustomList", b =>
                 {
                     b.Property<int>("Id")
@@ -101,7 +167,13 @@ namespace Sosyal_Kutuphane.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ReviewId")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("RatingId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ReviewId")
                         .HasColumnType("integer");
 
                     b.Property<int>("UserId")
@@ -138,6 +210,8 @@ namespace Sosyal_Kutuphane.Data.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Ratings");
                 });
@@ -242,6 +316,52 @@ namespace Sosyal_Kutuphane.Data.Migrations
                     b.ToTable("UserMedia");
                 });
 
+            modelBuilder.Entity("Sosyal_Kutuphane.Models.ActivityComment", b =>
+                {
+                    b.HasOne("Sosyal_Kutuphane.Models.Rating", "Rating")
+                        .WithMany("Comments")
+                        .HasForeignKey("RatingId");
+
+                    b.HasOne("Sosyal_Kutuphane.Models.Review", "Review")
+                        .WithMany("Comments")
+                        .HasForeignKey("ReviewId");
+
+                    b.HasOne("Sosyal_Kutuphane.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Rating");
+
+                    b.Navigation("Review");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Sosyal_Kutuphane.Models.ActivityLike", b =>
+                {
+                    b.HasOne("Sosyal_Kutuphane.Models.Rating", "Rating")
+                        .WithMany("Likes")
+                        .HasForeignKey("RatingId");
+
+                    b.HasOne("Sosyal_Kutuphane.Models.Review", "Review")
+                        .WithMany("Likes")
+                        .HasForeignKey("ReviewId");
+
+                    b.HasOne("Sosyal_Kutuphane.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Rating");
+
+                    b.Navigation("Review");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Sosyal_Kutuphane.Models.CustomList", b =>
                 {
                     b.HasOne("Sosyal_Kutuphane.Models.User", "User")
@@ -255,13 +375,11 @@ namespace Sosyal_Kutuphane.Data.Migrations
 
             modelBuilder.Entity("Sosyal_Kutuphane.Models.CustomListItem", b =>
                 {
-                    b.HasOne("Sosyal_Kutuphane.Models.CustomList", "CustomList")
+                    b.HasOne("Sosyal_Kutuphane.Models.CustomList", null)
                         .WithMany("Items")
                         .HasForeignKey("CustomListId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("CustomList");
                 });
 
             modelBuilder.Entity("Sosyal_Kutuphane.Models.Follow", b =>
@@ -283,6 +401,17 @@ namespace Sosyal_Kutuphane.Data.Migrations
                     b.Navigation("Following");
                 });
 
+            modelBuilder.Entity("Sosyal_Kutuphane.Models.Rating", b =>
+                {
+                    b.HasOne("Sosyal_Kutuphane.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Sosyal_Kutuphane.Models.Review", b =>
                 {
                     b.HasOne("Sosyal_Kutuphane.Models.User", "User")
@@ -296,18 +425,30 @@ namespace Sosyal_Kutuphane.Data.Migrations
 
             modelBuilder.Entity("Sosyal_Kutuphane.Models.UserMedia", b =>
                 {
-                    b.HasOne("Sosyal_Kutuphane.Models.User", "User")
+                    b.HasOne("Sosyal_Kutuphane.Models.User", null)
                         .WithMany("MediaList")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Sosyal_Kutuphane.Models.CustomList", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Sosyal_Kutuphane.Models.Rating", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Likes");
+                });
+
+            modelBuilder.Entity("Sosyal_Kutuphane.Models.Review", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Likes");
                 });
 
             modelBuilder.Entity("Sosyal_Kutuphane.Models.User", b =>

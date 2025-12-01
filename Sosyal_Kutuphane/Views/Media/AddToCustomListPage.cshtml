@@ -1,0 +1,26 @@
+﻿@model List<Sosyal_Kutuphane.Models.CustomList>
+
+<h2>Select a Custom List</h2>
+
+<form method="post" asp-controller="Media" asp-action="AddToCustomList">
+
+    <input type="hidden" name="mediaId" value="@ViewBag.MediaId" />
+    <input type="hidden" name="mediaType" value="@ViewBag.MediaType" />
+
+    <div class="mb-3">
+        <label class="form-label">Choose List:</label>
+        <select class="form-select" name="listId" required>
+            @foreach (var list in Model)
+            {
+                <option value="@list.Id">@list.Name</option>
+            }
+        </select>
+    </div>
+
+    <button class="btn btn-primary">Add to List</button>
+
+    <a class="btn btn-secondary ms-2" asp-controller="Profile" asp-action="CreateList">
+        Create New List
+    </a>
+
+</form>

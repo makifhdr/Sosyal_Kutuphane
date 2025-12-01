@@ -12,13 +12,91 @@
 }
 
 <h1>@Model["title"]</h1>
-<p>@Model["overview"]</p>
-<p><strong>Release Year:</strong> @Model["release_date"]</p>
-<p><strong>Duration:</strong> @durationString</p>
-<p>
-    <strong>Genres:</strong>
-    @string.Join(", ", @Model["genres"].Select(g => g["name"].ToString()))
-</p>
+
+<div class="container mt-4">
+    
+    <div class="row">
+        
+        <div class="col-md-4">
+            @{
+                var poster = $"https://image.tmdb.org/t/p/w500{Model["poster_path"]}";
+            }
+            <img src="@poster" width="300" alt=""/>
+        </div>
+        
+        <div class="col-md-8">
+            
+            <p>
+    
+                @Model["overview"]
+            </p>
+            
+            @{
+                var releaseYear = Model["release_date"].ToString() != "" ? 
+                    Model["release_date"].ToString().Substring(0, 4) : 
+                    "No information";
+            }
+            <p>
+                <strong>Release Year:</strong> @releaseYear
+            </p>
+            
+            <p>
+                <strong>Duration:</strong> @durationString
+            </p>
+            
+            <p>
+                @{
+                    var genres = Model["genres"].Count() != 0 ? 
+                        string.Join(", ", @Model["genres"].Select(g => g["name"].ToString())) :
+                        "No information";
+                }
+                <strong>Genres:</strong>
+                @genres
+            </p>
+            @{
+                var ratingList = _db.Ratings
+                    .Where(r => r.MediaId == mediaId && r.MediaType == mediaType).ToList();
+                int ratingSum = 0;
+
+                double? ratingAverage = 0.0;
+
+                if (!ratingList.IsNullOrEmpty())
+                {
+                    foreach (var rating in ratingList)
+                    {
+                        ratingSum += rating.Score;
+                    }
+                }
+
+                if(ratingSum != 0) ratingAverage = ratingSum / (double)ratingList.Count;
+    
+                var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+                int? currentUser = userIdClaim != null ? int.Parse(userIdClaim) : null;
+
+                int? userRating = null;
+
+                if (currentUser != null)
+                {
+                    userRating = _db.Ratings
+                        .Where(r => r.MediaId == mediaId && r.MediaType == mediaType && r.UserId == currentUser)
+                        .Select(r => (int?)r.Score)
+                        .FirstOrDefault();
+                }
+            }
+            @if (ratingAverage != 0)
+            {
+                <p>
+                    <strong>Average Rating:</strong> @ratingAverage/10 
+                    <text class="text-muted"> (@ratingList.Count ratings) </text>
+                </p>
+            }
+            
+        </div>
+        
+    </div>
+    
+</div>
+
 
 <h3>Director</h3>
 @Model["credits"]?["crew"]!.FirstOrDefault(c => (string)c["job"]! == "Director")?["name"]
@@ -43,12 +121,6 @@
     }
 }
 
-
-@{
-    var poster = $"https://image.tmdb.org/t/p/w500{Model["poster_path"]}";
-}
-<img src="@poster" width="300" alt=""/>
-
 <!-- Library Buttons -->
 @{
     int? userId = User.Identity.IsAuthenticated
@@ -58,10 +130,6 @@
     var userMedia = userId != null
         ? _db.UserMedia.FirstOrDefault(um => um.UserId == userId && um.MediaId == mediaId && um.MediaType == mediaType)
         : null;
-
-    var myLists = userId != null
-        ? _db.CustomList.Where(c => c.UserId == userId).ToList()
-        : new List<Sosyal_Kutuphane.Models.CustomList>();
 }
             @if (User.Identity.IsAuthenticated)
             {
@@ -111,29 +179,32 @@
 
                 <!-- Custom List Add -->
                 <div class="mt-3">
-                    <form method="post" asp-controller="Media" asp-action="AddToCustomList" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="mediaId" value="@mediaId" />
-                        <input type="hidden" name="mediaType" value="@mediaType" />
-
-                        <select name="listId" class="form-select d-inline w-auto">
-                            <option value="">Add to custom list...</option>
-                            @foreach (var list in myLists)
-                            {
-                                <option value="@list.Id">@list.Name</option>
-                            }
-                        </select>
-
-                        <button class="btn btn-outline-secondary ms-2">Add</button>
-                    </form>
+                    <!-- Custom List Add -->
+                    <div class="mt-3">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a asp-controller="Media"
+                               asp-action="AddToCustomListPage"
+                               asp-route-mediaId="@mediaId"
+                               asp-route-mediaType="@mediaType"
+                               class="btn btn-outline-secondary mt-3">
+                                Add to Custom List
+                            </a>
+                        }
+                    </div>
                 </div>
             }
+            
+            @if (userRating != null)
+            {
+                <p><strong>Your rating:</strong> @userRating/10</p>
+            }
 
-<form method="post" action="/Activity/Rate">
+            <form method="post" action="/Activity/Rate">
     <input type="hidden" name="mediaId" value="@Model["id"]" />
-    <input type="hidden" name="mediaType" value="movie" /> <!-- book için "book" -->
+    <input type="hidden" name="mediaType" value="movie" />
     
-    <label><strong>Your Rating (1–10):</strong></label>
+    <label><strong>Give a new rating (1–10):</strong></label>
     <input type="number" name="score" min="1" max="10" class="form-control w-25" required />
 
     <button class="btn btn-primary mt-2">Submit Rating</button>
@@ -152,6 +223,7 @@
 <h3 class="mt-5">User Reviews</h3>
         
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.IdentityModel.Tokens
 @{
     var reviews = _db.Reviews
         .Where(r => r.MediaId == mediaId && r.MediaType == mediaType)

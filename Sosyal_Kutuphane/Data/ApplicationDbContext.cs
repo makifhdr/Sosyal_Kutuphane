@@ -27,6 +27,10 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<CustomListItem> CustomListItem { get; set; }
     
+    public DbSet<ActivityComment> ActivityComment { get; set; }
+    
+    public DbSet<ActivityLike> ActivityLike { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

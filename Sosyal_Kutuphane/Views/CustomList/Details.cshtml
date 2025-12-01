@@ -3,12 +3,29 @@
 
 @{
     ViewData["Title"] = Model.Name;
+
+    var avatarByte = Model.User.Avatar;
+    string avatar = avatarByte != null 
+        ? $"data:image/png;base64,{Convert.ToBase64String(avatarByte)}"
+        : "/default-avatar.jpg";
+
+    var userName = Model.User.UserName;
 }
 
 <div class="container mt-4">
-    <h2>@Model.Name</h2>
 
-    <a class="btn btn-secondary mb-3" asp-controller="Profile" asp-action="Index">Back to Profile</a>
+    <a href="/Profile/Index/@ViewBag.OwnerId" class="btn btn-secondary mb-3">
+        Back to Profile
+    </a>
+    <br/>
+    
+    <h2>@Model.Name</h2>
+    
+    <img src="@avatar"
+         width="50" height="50"
+         class="rounded-circle border" />
+    <a>@userName</a>
+    
     
     @inject GoogleBooksService gbooks;
     @inject TmdbService tmdb;
@@ -33,13 +50,19 @@
                                     case "movie":
                                     {
                                         var itemName = await tmdb.GetMovieTitle(item.MediaId);
-                                        <p class="card-text">@itemName - Movie</p>
+                                        <a  href="/Media/MovieDetails/@item.MediaId"
+                                            class="text-decoration-none">@itemName</a>
+                                        <br/>
+                                        <small class="text-muted">Movie</small>
                                         break;
                                     }
                                     case "book":
                                     {
                                         var itemName = await gbooks.GetBookTitle(item.MediaId);
-                                        <p class="card-text">@itemName - Book</p>
+                                        <a href="/Media/BookDetails/@item.MediaId" 
+                                           class="text-decoration-none ">@itemName</a>
+                                        <br/>
+                                        <small class="text-muted">Book</small>
                                         break;
                                     }
                                 }

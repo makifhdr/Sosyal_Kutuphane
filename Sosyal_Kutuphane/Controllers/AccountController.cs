@@ -22,7 +22,7 @@ public class AccountController : BaseController
     public IActionResult Register()
     {
         if (User.Identity is { IsAuthenticated: true } || IsLoggedIn())
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Feed", "Activity");
 
         return View();
     }
@@ -31,7 +31,7 @@ public class AccountController : BaseController
     public IActionResult Register(string email, string username, string password, string confirmPassword)
     {
         if (IsLoggedIn())
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Feed", "Activity");
         
         if (password != confirmPassword)
         {
@@ -62,7 +62,7 @@ public class AccountController : BaseController
     public IActionResult Login()
     {
         if (User.Identity is { IsAuthenticated: true } || IsLoggedIn())
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Feed", "Activity");
         
         if (TempData["PasswordResetSuccess"] != null)
             ViewBag.Success = TempData["PasswordResetSuccess"];
@@ -91,7 +91,7 @@ public class AccountController : BaseController
 
         await HttpContext.SignInAsync("MyCookieAuth", new ClaimsPrincipal(identity));
 
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Feed", "Activity");
     }
     
     public async Task<IActionResult> Logout()
@@ -107,8 +107,8 @@ public class AccountController : BaseController
     [HttpGet]
     public IActionResult ForgotPassword()
     {
-        if (User.Identity != null && User.Identity.IsAuthenticated)
-            return RedirectToAction("Index", "Home");
+        if (User.Identity is { IsAuthenticated: true })
+            return RedirectToAction("Feed", "Activity");
 
         return View();
     }
@@ -122,25 +122,21 @@ public class AccountController : BaseController
             ViewBag.Error = "No account found with this email.";
             return View();
         }
-
-        // Generate secure random token
+        
         string token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
         token = token.Replace("=", "").Replace("+", "").Replace("/", "");
-
-        // Save token and expiry
+        
         user.ResetToken = token;
         user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
         _db.SaveChanges();
-
-        // Link to send
+        
         var resetLink = Url.Action(
             "ResetPassword",
             "Account",
             new { uid = user.Id, token = token },
             protocol: Request.Scheme
         );
-
-        // Send e-mail (SMTP)
+        
         SendResetEmail(user.Email, resetLink);
 
         ViewBag.Success = "A password reset link has been sent to your email.";

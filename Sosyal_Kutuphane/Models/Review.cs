@@ -13,4 +13,7 @@ public class Review
     public string Content { get; set; }
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    
+    public List<ActivityLike> Likes { get; set; }
+    public List<ActivityComment> Comments { get; set; }
 }

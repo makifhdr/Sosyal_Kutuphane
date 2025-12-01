@@ -14,19 +14,17 @@ public class CustomListController : Controller
     {
         _db = db;
     }
-
-    // GET: /CustomList/Details/5
+    
     public IActionResult Details(int id)
     {
         var list = _db.CustomList
             .Include(l => l.Items)
+            .Include(l => l.User)
             .FirstOrDefault(l => l.Id == id);
 
         if (list == null) return NotFound();
 
-        // Güvenlik: sadece owner görebilir
-        var userId = int.Parse(User.FindFirst("UserId").Value);
-        if (list.UserId != userId) return Forbid();
+        ViewBag.OwnerId = list.UserId;
 
         return View(list);
     }

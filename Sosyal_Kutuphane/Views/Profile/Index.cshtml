@@ -1,4 +1,5 @@
-﻿@model Sosyal_Kutuphane.Models.User
+﻿@using Microsoft.IdentityModel.Tokens
+@model Sosyal_Kutuphane.Models.User
 
 @{
     bool isOwner = ViewBag.IsOwner;
@@ -8,7 +9,10 @@
 
     string avatar = Model.Avatar != null 
         ? $"data:image/png;base64,{Convert.ToBase64String(Model.Avatar)}"
-        : "/avatars/default.png";
+        : "/default-avatar.jpg";
+    var bio = Model.Bio.IsNullOrEmpty() ? "No biography has been written." : Model.Bio;
+    
+    //Boş arama ve başkasının listesine bakmayı düzelt
 }
 
 <div class="container mt-4">
@@ -21,7 +25,7 @@
 
         <div class="ms-4">
             <h2>@Model.UserName</h2>
-            <p class="text-muted">@Model.Bio</p>
+            <p class="text-muted">@bio</p>
 
             @if (isOwner)
             {
@@ -75,12 +79,19 @@
 
         <!-- Custom Lists -->
         <div class="tab-pane fade" id="custom">
-            @foreach (var list in Model.CustomLists)
+            @if (Model.CustomLists.Count != 0)
             {
-                <div class="card p-3 mt-3">
-                    <h4>@list.Name</h4>
-                    <a class="btn btn-outline-primary mt-2" href="/CustomList/Details/@list.Id">View List</a>
-                </div>
+                foreach (var list in Model.CustomLists)
+                {
+                    <div class="card p-3 mt-3">
+                        <h4>@list.Name</h4>
+                        <a class="btn btn-outline-primary mt-2" href="/CustomList/Details/@list.Id">View List</a>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-muted">No custom lists found.</div>
             }
         </div>
 
@@ -98,9 +109,13 @@
                 {
                     foreach (var r in ratings)
                     {
-                        <div class="card p-3 mt-3">
-                            <strong>@r.Title</strong>
-                            <dd><strong>Type: </strong> @r.MediaType</dd>
+                        var href = r.MediaType == "movie" ? $"/Media/MovieDetails/{r.MediaId}" :
+                            $"/Media/BookDetails/{r.MediaId}" ;
+                        var type = r.MediaType == "movie" ? "Movie" : "Book";
+                        <div 
+                            class="card p-3 mt-3">
+                            <a href="@href" class="text-decoration-none">@r.Title</a>
+                            <dd><strong>Type: </strong> @type</dd>
                             <div>Rated: @r.Score / 10</div>
                             <div class="text-muted">@Sosyal_Kutuphane.Helpers.TimeAgo.Format(r.CreatedAt)</div>
                         </div>
@@ -119,10 +134,13 @@
                 {
                     foreach (var r in reviews)
                     {
+                        var href = r.MediaType == "movie" ? $"/Media/MovieDetails/{r.MediaId}" :
+                            $"/Media/BookDetails/{r.MediaId}" ;
+                        var type = r.MediaType == "movie" ? "Movie" : "Book";
                         <div class="card p-3 mt-3">
 
-                            <h5>@r.Title</h5>
-                            <dd><strong>Type: </strong> @r.MediaType</dd>
+                            <a href="@href" class="text-decoration-none">@r.Title</a>
+                            <dd><strong>Type: </strong> @type</dd>
                             <p>@r.Content</p>
 
                             <div class="text-muted">

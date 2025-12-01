@@ -1,0 +1,31 @@
+﻿@model Sosyal_Kutuphane.Models.ViewModels.ActivityCommentViewModel
+
+@{
+    ViewData["Title"] = "Add Comment";
+}
+
+<div class="container mt-4">
+    <h2>Add Comment</h2>
+
+    <div class="card p-3 mt-3">
+        <form asp-action="AddComment" method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="ActivityId" />
+            <input type="hidden" asp-for="ActivityType" />
+
+            <div class="mb-3">
+                <label asp-for="Content" class="form-label">Your comment</label>
+                <textarea asp-for="Content" class="form-control" rows="5" required></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit Comment</button>
+            <a class="btn btn-secondary ms-2" href="javascript:history.back()">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
