@@ -6,46 +6,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="773391db-e371-424b-8594-2944395ca537" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ActivityComment.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ActivityLike.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ActivityCommentDto.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ActivityCommentViewModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ActivityViewModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/AdvancedSearchViewModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ExploreViewModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/HomeShowcaseViewModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/PagedFeedViewModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Activity/AddComment.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Activity/Feed.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/AddToCustomListPage.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Search/AdvancedResults.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Sosyal_Kutuphane/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Sosyal_Kutuphane/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/AccountController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/AccountController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/ActivityController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/ActivityController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/CustomListController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/CustomListController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/HomeController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/MediaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/MediaController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/ProfileController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/ProfileController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/SearchController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/SearchController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Data/ApplicationDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Data/ApplicationDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Data/Migrations/ApplicationDbContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Data/Migrations/ApplicationDbContextModelSnapshot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Like.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Like.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Rating.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Rating.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Review.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Review.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Services/TmdbService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Services/TmdbService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Sosyal_Kutuphane.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Sosyal_Kutuphane.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/CustomList/Details.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/CustomList/Details.cshtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Home/Index.cshtml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/BookDetails.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/BookDetails.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/MovieDetails.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/MovieDetails.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Profile/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Profile/Index.cshtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Search/BookResults.cshtml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Search/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Search/Index.cshtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Search/MovieResults.cshtml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Shared/Components/UserMediaList/Default.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Shared/Components/UserMediaList/Default.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Shared/_Layout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Shared/_Layout.cshtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,6 +48,7 @@
     <setting file="file://$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ActivityCommentDto.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ActivityCommentViewModel.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/PagedFeedViewModel.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/makif/RiderProjects/Sosyal_Kutuphane/Sosyal_Kutuphane/Program.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -166,7 +132,7 @@
       <workItem from="1764326092598" duration="3861000" />
       <workItem from="1764407877465" duration="11483000" />
       <workItem from="1764493097763" duration="9766000" />
-      <workItem from="1764578820644" duration="8082000" />
+      <workItem from="1764578820644" duration="8272000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -176,7 +142,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764269114719</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Major additions; Home feed with user activities, likes and comments on activities, filtered search etc.">
+      <option name="closed" value="true" />
+      <created>1764601644836</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1764601644836</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -198,7 +172,8 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Initial commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial commit" />
+    <MESSAGE value="Major additions; Home feed with user activities, likes and comments on activities, filtered search etc." />
+    <option name="LAST_COMMIT_MESSAGE" value="Major additions; Home feed with user activities, likes and comments on activities, filtered search etc." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
