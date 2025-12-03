@@ -48,10 +48,6 @@ namespace Sosyal_Kutuphane.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RatingId");
-
-                    b.HasIndex("ReviewId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("ActivityComment");
@@ -65,9 +61,6 @@ namespace Sosyal_Kutuphane.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int?>("RatingId")
                         .HasColumnType("integer");
 
@@ -78,12 +71,6 @@ namespace Sosyal_Kutuphane.Data.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RatingId");
-
-                    b.HasIndex("ReviewId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("ActivityLike");
                 });
@@ -166,12 +153,6 @@ namespace Sosyal_Kutuphane.Data.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("RatingId")
-                        .HasColumnType("integer");
 
                     b.Property<int?>("ReviewId")
                         .HasColumnType("integer");
@@ -318,46 +299,11 @@ namespace Sosyal_Kutuphane.Data.Migrations
 
             modelBuilder.Entity("Sosyal_Kutuphane.Models.ActivityComment", b =>
                 {
-                    b.HasOne("Sosyal_Kutuphane.Models.Rating", "Rating")
-                        .WithMany("Comments")
-                        .HasForeignKey("RatingId");
-
-                    b.HasOne("Sosyal_Kutuphane.Models.Review", "Review")
-                        .WithMany("Comments")
-                        .HasForeignKey("ReviewId");
-
                     b.HasOne("Sosyal_Kutuphane.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Rating");
-
-                    b.Navigation("Review");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Sosyal_Kutuphane.Models.ActivityLike", b =>
-                {
-                    b.HasOne("Sosyal_Kutuphane.Models.Rating", "Rating")
-                        .WithMany("Likes")
-                        .HasForeignKey("RatingId");
-
-                    b.HasOne("Sosyal_Kutuphane.Models.Review", "Review")
-                        .WithMany("Likes")
-                        .HasForeignKey("ReviewId");
-
-                    b.HasOne("Sosyal_Kutuphane.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Rating");
-
-                    b.Navigation("Review");
 
                     b.Navigation("User");
                 });
@@ -435,20 +381,6 @@ namespace Sosyal_Kutuphane.Data.Migrations
             modelBuilder.Entity("Sosyal_Kutuphane.Models.CustomList", b =>
                 {
                     b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("Sosyal_Kutuphane.Models.Rating", b =>
-                {
-                    b.Navigation("Comments");
-
-                    b.Navigation("Likes");
-                });
-
-            modelBuilder.Entity("Sosyal_Kutuphane.Models.Review", b =>
-                {
-                    b.Navigation("Comments");
-
-                    b.Navigation("Likes");
                 });
 
             modelBuilder.Entity("Sosyal_Kutuphane.Models.User", b =>

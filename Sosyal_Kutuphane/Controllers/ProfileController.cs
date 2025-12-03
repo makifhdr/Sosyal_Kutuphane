@@ -38,28 +38,22 @@ public class ProfileController : Controller
             return NotFound();
 
         ViewBag.IsOwner = targetUserId == currentUserId;
-
-        // Takip kontrolü
+        
         ViewBag.IsFollowing = _db.Follow.Any(f =>
             f.FollowerId == currentUserId && f.FollowingId == targetUserId);
-
-        // --- SON AKTİVİTELER ---
-
-        // Yorumlar
+        
         var reviews = _db.Reviews
             .Where(r => r.UserId == targetUserId)
             .OrderByDescending(r => r.CreatedAt)
             .Take(10)
             .ToList();
-
-        // Ratingler
+        
         var ratings = _db.Ratings
             .Where(r => r.UserId == targetUserId)
             .OrderByDescending(r => r.CreatedAt)
             .Take(10)
             .ToList();
-
-        // API çağrıları (film mü kitap mı bakıyoruz)
+        
         ViewBag.RecentRatings = await Task.WhenAll(ratings.Select(async x =>
         {
             string title = x.MediaType == "movie"
@@ -117,8 +111,7 @@ public class ProfileController : Controller
             user.UserName = username;
 
         user.Bio = bio;
-
-        // Avatar değişmişse
+        
         if (avatar != null)
         {
             using (var ms = new MemoryStream())
@@ -171,25 +164,21 @@ public class ProfileController : Controller
             return RedirectToAction("Feed", "Activity");
         }
         
-        // Giriş yapan kullanıcıyı al
         var currentUserId = int.Parse(User.FindFirst("UserId").Value);
-
-        // Kendi kendini takip etmeyi engelle
+        
         if (currentUserId == targetUserId)
             return RedirectToAction("Index", new { id = targetUserId });
-
-        // İlişki zaten var mı?
+        
         var existingFollow = _db.Follow
             .FirstOrDefault(f => f.FollowerId == currentUserId && f.FollowingId == targetUserId);
 
         if (existingFollow != null)
         {
-            // ❌ Zaten takip ediyorsa -> takipten çık
+            
             _db.Follow.Remove(existingFollow);
         }
         else
         {
-            // ✔ Takip etmiyorsa -> yeni takip kaydı ekle
             var follow = new Follow
             {
                 FollowerId = currentUserId,

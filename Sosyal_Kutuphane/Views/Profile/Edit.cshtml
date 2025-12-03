@@ -12,7 +12,6 @@
 
             <div class="row">
 
-                <!-- Avatar gösterimi -->
                 <div class="col-md-3 text-center">
                     @{
                         string avatar = Model.Avatar != null
@@ -22,7 +21,8 @@
                     <img src="@avatar"
                          class="rounded-circle border"
                          width="140" height="140"
-                         style="object-fit: cover;" />
+                         style="object-fit: cover;" 
+                         alt="Image couldn't be displayed"/>
                     
                     <label class="form-label">Change your avatar</label>
 
@@ -31,7 +31,6 @@
                     </div>
                 </div>
 
-                <!-- Bilgiler -->
                 <div class="col-md-9">
 
                     <div class="mb-3">

@@ -8,8 +8,6 @@ using System.Security.Claims;
 
 namespace Sosyal_Kutuphane.Controllers;
 
-
-//App Password: fmwc earl pskx iqqm
 public class AccountController : BaseController
 {
     private readonly ApplicationDbContext _db;

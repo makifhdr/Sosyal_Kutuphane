@@ -4,7 +4,7 @@
 <h2>Filtered Results</h2>
 <p>
     Showing results for "<strong>@Model.Query</strong>"
-    @inject TmdbService? _tmdb
+    @inject TmdbService _tmdb
     @{
         var genres = await _tmdb.GetMovieGenres();
         var currentGenre = "";
@@ -59,12 +59,12 @@
             var info = b["volumeInfo"];
             var img = info?["imageLinks"]?["thumbnail"];
             var date = info?["publishedDate"] != null ? 
-                $" ({info?["publishedDate"]?.ToString().Substring(0,4)})" :
+                $" ({info["publishedDate"]?.ToString().Substring(0,4)})" :
                 "";
 
             <div class="col-md-3 mb-4">
                 <div class="card shadow">
-                    <img src="@img" class="card-img-top" />
+                    <img src="@img" class="card-img-top" alt="Image couldn't be displayed"/>
 
                     <div class="card-body">
                         <strong>@info?["title"] @date</strong><br />

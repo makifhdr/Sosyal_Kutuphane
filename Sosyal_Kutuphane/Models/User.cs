@@ -27,5 +27,4 @@ public class User
     public List<UserMedia> MediaList { get; set; }
     
     public List<CustomList> CustomLists { get; set; }
-    
 }

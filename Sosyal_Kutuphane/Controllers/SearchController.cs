@@ -64,15 +64,14 @@ public class SearchController : Controller
                     ? $"https://image.tmdb.org/t/p/w342{movie["poster_path"]}"
                     : "/images/no-poster.png";
             }
-            else // book
+            else
             {
                 JObject book = await _books.GetBookDetails(g.MediaId);
                 title = book["volumeInfo"]?["title"]?.ToString() ?? "Unknown book";
                 poster = book["volumeInfo"]?["imageLinks"]?["thumbnail"]?.ToString()
                     ?? "/images/no-cover.png";
             }
-
-            // Popülerlik verileri (yorum / liste / kütüphane)
+            
             int reviewCount = await _db.Reviews
                 .CountAsync(r => r.MediaId == g.MediaId && r.MediaType == g.MediaType);
 
@@ -101,7 +100,6 @@ public class SearchController : Controller
     
     private async Task<List<ShowcaseItemViewModel>> GetMostPopularAsync(int limit)
     {
-        // Temel olarak: review + library + custom list sayısına göre sıralama
         var popularity = await _db.Reviews
             .GroupBy(r => new { r.MediaId, r.MediaType })
             .Select(g => new
@@ -111,8 +109,7 @@ public class SearchController : Controller
                 ReviewCount = g.Count()
             })
             .ToListAsync();
-
-        // UserMedia
+        
         var libStats = await _db.UserMedia
             .GroupBy(m => new { m.MediaId, m.MediaType })
             .Select(g => new
@@ -122,8 +119,7 @@ public class SearchController : Controller
                 LibraryCount = g.Count()
             })
             .ToListAsync();
-
-        // CustomListItem
+        
         var listStats = await _db.CustomListItem
             .GroupBy(c => new { c.MediaId, c.MediaType })
             .Select(g => new
@@ -133,8 +129,7 @@ public class SearchController : Controller
                 CustomListCount = g.Count()
             })
             .ToListAsync();
-
-        // Hepsini hafızada birleştir
+        
         var items = popularity
             .Select(p => new
             {
@@ -232,24 +227,20 @@ public class SearchController : Controller
             Year = year,
             MinRating = minRating,
         };
-
-        // --- MOVIES ---
+        
         if (type == "movie")
         {
-            // mevcut tek JObject döndüren metoda göre
-            var moviesData = await _tmdb.SearchMovie(query); // JObject
+            var moviesData = await _tmdb.SearchMovie(query);
             var movies = moviesData["results"]?
                 .Select(r => (JObject)r)
                 .ToList() ?? new List<JObject>();
-
-        // genre filtresi artık çalışır
+            
             if (!string.IsNullOrWhiteSpace(genre))
                 movies = movies
                     .Where(m => m["genre_ids"] != null &&
                                 m["genre_ids"].Any(g => g.ToString() == genre))
                     .ToList();
-
-            // Year filter
+            
             if (year != null)
                 movies = movies
                     .Where(m => m["release_date"]?.ToString().StartsWith(year.ToString())??false)
@@ -284,11 +275,10 @@ public class SearchController : Controller
             vm.MovieResults = movies;
             return View("AdvancedResults", vm);
         }
-
-        // --- BOOKS ---
+        
         if (type == "book")
         {
-            var booksData = await _books.SearchBooks(query); // JObject
+            var booksData = await _books.SearchBooks(query);
             var books = booksData["items"]?
                 .Select(i => (JObject)i)
                 .ToList() ?? new List<JObject>();
@@ -305,8 +295,7 @@ public class SearchController : Controller
                     );
                 }).ToList();
             }
-
-            // year filtresi örneği
+            
             if (year != null)
                 books = books.Where(b =>
                 {
@@ -322,7 +311,6 @@ public class SearchController : Controller
                 })
                 .ToDictionary(x => x.MediaId, x => x.AvgScore);
 
-            // Rating (books often missing ratings)
             if (minRating != null)
                 books = books
                     .Where(b =>
@@ -332,10 +320,10 @@ public class SearchController : Controller
 
                         if (ratingLookup.TryGetValue(id, out double dbRating))
                         {
-                            return dbRating >= minRating.Value;  // FİLTRE BURADA
+                            return dbRating >= minRating.Value;
                         }
 
-                        return false; // hiç rating yoksa göstermiyoruz
+                        return false;
                     })
                     .ToList();
 

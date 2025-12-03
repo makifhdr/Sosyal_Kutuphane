@@ -7,18 +7,32 @@
   <component name="ChangeListManager">
     <list default="true" id="773391db-e371-424b-8594-2944395ca537" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Sosyal_Kutuphane/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Sosyal_Kutuphane/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/AccountController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/AccountController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/ActivityController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/ActivityController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/MediaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/MediaController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/ProfileController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/ProfileController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/SearchController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/SearchController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Data/Migrations/ApplicationDbContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Data/Migrations/ApplicationDbContextModelSnapshot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ActivityComment.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ActivityComment.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ActivityLike.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ActivityLike.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Like.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Like.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Rating.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Rating.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Review.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Review.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/User.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ActivityViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ActivityViewModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ExploreViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ExploreViewModel.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/HomeShowcaseViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/HomeShowcaseViewModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Properties/launchSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Properties/launchSettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Account/Login.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Account/Login.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Activity/EditReview.cshtml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Activity/Feed.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Activity/Feed.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/CustomList/Details.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/CustomList/Details.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/AddToCustomListPage.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/AddToCustomListPage.cshtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/BookDetails.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/BookDetails.cshtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/MovieDetails.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/MovieDetails.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Profile/Edit.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Profile/Edit.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Profile/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Profile/Index.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Search/AdvancedResults.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Search/AdvancedResults.cshtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Search/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Search/Index.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Shared/_AuthLayout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Shared/_AuthLayout.cshtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,6 +58,7 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock://C:/Users/makif/RiderProjects/Sosyal_Kutuphane/Sosyal_Kutuphane/Controllers/ActivityController.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/CustomListController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/ProfileController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Sosyal_Kutuphane/Helpers/TimeAgo.cs" root0="FORCE_HIGHLIGHTING" />
@@ -55,8 +70,12 @@
     <setting file="file://$PROJECT_DIR$/Sosyal_Kutuphane/Models/UserMedia.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ActivityCommentDto.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ActivityCommentViewModel.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/makif/RiderProjects/Sosyal_Kutuphane/Sosyal_Kutuphane/Models/ViewModels/ActivityViewModel.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/makif/RiderProjects/Sosyal_Kutuphane/Sosyal_Kutuphane/Models/ViewModels/HomeShowcaseViewModel.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/PagedFeedViewModel.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/makif/RiderProjects/Sosyal_Kutuphane/Sosyal_Kutuphane/Program.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/makif/RiderProjects/Sosyal_Kutuphane/Sosyal_Kutuphane/Views/Activity/Feed.cshtml" root0="FORCE_HIGHLIGHTING" root1="SKIP_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/makif/RiderProjects/Sosyal_Kutuphane/Sosyal_Kutuphane/Views/Media/BookDetails.cshtml" root0="FORCE_HIGHLIGHTING" root1="SKIP_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/makif/RiderProjects/Sosyal_Kutuphane/Sosyal_Kutuphane/Views/Search/Index.cshtml" root0="FORCE_HIGHLIGHTING" root1="SKIP_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -143,6 +162,8 @@
       <workItem from="1764578820644" duration="8272000" />
       <workItem from="1764683991147" duration="3438000" />
       <workItem from="1764689451071" duration="9995000" />
+      <workItem from="1764766065624" duration="4120000" />
+      <workItem from="1764777423015" duration="2633000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -168,7 +189,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764684102392</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Dynamic GUI changes, removing unused classes and methods">
+      <option name="closed" value="true" />
+      <created>1764766357884</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1764766357884</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -192,7 +221,8 @@
     <MESSAGE value="Initial commit" />
     <MESSAGE value="Major additions; Home feed with user activities, likes and comments on activities, filtered search etc." />
     <MESSAGE value="Deleting unused files" />
-    <option name="LAST_COMMIT_MESSAGE" value="Deleting unused files" />
+    <MESSAGE value="Dynamic GUI changes, removing unused classes and methods" />
+    <option name="LAST_COMMIT_MESSAGE" value="Dynamic GUI changes, removing unused classes and methods" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

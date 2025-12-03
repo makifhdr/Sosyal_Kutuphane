@@ -3,7 +3,6 @@
 <h2>Select a Custom List</h2>
 
 <form method="post" asp-controller="Media" asp-action="AddToCustomList">
-
     <input type="hidden" name="mediaId" value="@ViewBag.MediaId" />
     <input type="hidden" name="mediaType" value="@ViewBag.MediaType" />
 
@@ -22,5 +21,4 @@
     <a class="btn btn-secondary ms-2" asp-controller="Profile" asp-action="CreateList">
         Create New List
     </a>
-
 </form>

@@ -143,7 +143,6 @@ public class ActivityController : Controller
     [HttpGet]
     public IActionResult AddComment(int activityId, string activityType)
     {
-        // Basit doğrulama
         if (activityType != "rating" && activityType != "review")
             return BadRequest("Invalid activity type.");
 
@@ -155,8 +154,7 @@ public class ActivityController : Controller
 
         return View(vm);
     }
-
-    // POST: formu işler
+    
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult AddComment(ActivityCommentViewModel model)
@@ -265,8 +263,7 @@ public class ActivityController : Controller
     public async Task<IActionResult> Feed(int page = 1, int pageSize = 10)
     {
         var currentUserId = int.Parse(User.FindFirst("UserId").Value);
-
-        // 1) Takip edilen kullanıcıların id'leri
+        
         var followingIds = await _db.Follow
             .Where(f => f.FollowerId == currentUserId)
             .Select(f => f.FollowingId)
@@ -274,14 +271,12 @@ public class ActivityController : Controller
 
         if (followingIds.Count == 0)
         {
-            // Takip edilen yoksa boş liste döndür
             return View(new PagedFeedViewModel());
         }
-
-        // 2) Ratings ve Reviews'leri ayrı ayrı çek (User nav ile)
+        
         var ratingsList = await _db.Ratings
             .Where(r => followingIds.Contains(r.UserId))
-            .Include(r => r.User)   // navigation olmalı
+            .Include(r => r.User)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync();
 
@@ -290,8 +285,7 @@ public class ActivityController : Controller
             .Include(rv => rv.User)
             .OrderByDescending(rv => rv.CreatedAt)
             .ToListAsync();
-
-        // 3) Like sayıları ( Ratings ve Reviews için ) — grouped sorgu
+        
         var ratingIds = ratingsList.Select(r => r.Id).ToList();
         var reviewIds = reviewsList.Select(rv => rv.Id).ToList();
 
@@ -309,15 +303,13 @@ public class ActivityController : Controller
 
         var likeCountByRating = likesForRatings.ToDictionary(x => x.RatingId, x => x.Count);
         var likeCountByReview = likesForReviews.ToDictionary(x => x.ReviewId, x => x.Count);
-
-        // 4) Tüm benzersiz (mediaType, mediaId) çiftlerini topla -> tekil fetch
+        
         var mediaKeys = ratingsList
             .Select(r => (r.MediaType, r.MediaId))
             .Concat(reviewsList.Select(rv => (rv.MediaType, rv.MediaId)))
             .Distinct()
             .ToList();
-
-        // 5) Media meta bilgilerini çek (başlık + poster) — cache dictionary
+        
         var mediaMeta = new Dictionary<(string mediaType, string mediaId), (string title, string posterUrl)>();
 
         foreach (var (mediaType, mediaId) in mediaKeys)
@@ -326,7 +318,6 @@ public class ActivityController : Controller
             {
                 if (mediaType == "movie")
                 {
-                    // tmdb servisinden detay al
                     var movie = await _tmdb.GetMovieDetails(mediaId);
                     var title = movie["title"]?.ToString() ?? "Unknown movie";
                     var poster = movie["poster_path"] != null
@@ -335,7 +326,7 @@ public class ActivityController : Controller
                     
                     mediaMeta[(mediaType, mediaId)] = (title, poster);
                 }
-                else // book
+                else
                 {
                     JObject book = await _books.GetBookDetails(mediaId);
                     var title = book["volumeInfo"]?["title"]?.ToString() ?? "Unknown book";
@@ -346,15 +337,13 @@ public class ActivityController : Controller
             }
             catch (Exception ex)
             {
-                // Servis hata verirse fallback değer ata (hata loglamayı unutma)
+                
                 Console.WriteLine(ex.Message);
                 mediaMeta[(mediaType, mediaId)] = ("Unknown title", "/images/no-cover.png");
             }
         }
         
         
-
-        // 6) ActivityViewModel listesi oluştur
         var activities = new List<ActivityViewModel>();
 
         foreach (var r in ratingsList)
@@ -438,8 +427,7 @@ public class ActivityController : Controller
                 IsLiked = liked
             });
         }
-
-        // 7) Birleştir, sırala, take limit uygula
+        
         var ordered = activities
             .OrderByDescending(a => a.CreatedAt)
             .ToList();

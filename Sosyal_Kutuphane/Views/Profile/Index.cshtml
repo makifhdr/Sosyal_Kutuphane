@@ -11,17 +11,15 @@
         ? $"data:image/png;base64,{Convert.ToBase64String(Model.Avatar)}"
         : "/default-avatar.jpg";
     var bio = Model.Bio.IsNullOrEmpty() ? "No biography has been written." : Model.Bio;
-    
-    //Boş arama ve başkasının listesine bakmayı düzelt
 }
 
 <div class="container mt-4">
 
-    <!-- ÜST BÖLÜM -->
     <div class="d-flex align-items-center">
         <img src="@avatar"
              width="120" height="120"
-             class="rounded-circle border" />
+             class="rounded-circle border" 
+             alt="Image couldn't be displayed"/>
 
         <div class="ms-4">
             <h2>@Model.UserName</h2>
@@ -57,27 +55,22 @@
 
     <div class="tab-content mt-3">
 
-        <!-- Watched -->
         <div class="tab-pane fade show active" id="watched">
             @await Component.InvokeAsync("UserMediaList", new { userId = Model.Id, status = "watched" })
         </div>
 
-        <!-- To Watch -->
         <div class="tab-pane fade" id="towatch">
             @await Component.InvokeAsync("UserMediaList", new { userId = Model.Id, status = "towatch" })
         </div>
 
-        <!-- Read -->
         <div class="tab-pane fade" id="read">
             @await Component.InvokeAsync("UserMediaList", new { userId = Model.Id, status = "read" })
         </div>
 
-        <!-- To Read -->
         <div class="tab-pane fade" id="toread">
             @await Component.InvokeAsync("UserMediaList", new { userId = Model.Id, status = "toread" })
         </div>
 
-        <!-- Custom Lists -->
         <div class="tab-pane fade" id="custom">
             @if (Model.CustomLists.Count != 0)
             {
@@ -95,7 +88,6 @@
             }
         </div>
 
-        <!-- Recent Activity -->
         <div class="tab-pane fade" id="activity">
             <h4>User Activity</h4>
 

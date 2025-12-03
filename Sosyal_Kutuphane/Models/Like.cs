@@ -7,6 +7,4 @@ public class Like
     public int UserId { get; set; }
 
     public int? ReviewId { get; set; }
-
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

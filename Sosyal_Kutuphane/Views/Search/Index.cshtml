@@ -4,16 +4,13 @@
 
     <h1>Search</h1>
 
-    <!-- UNIFIED SEARCH + ADVANCED FILTER FORM -->
     <form method="get" asp-controller="Search" asp-action="AdvancedSearch" class="row g-3 mb-5">
 
-        <!-- QUERY -->
         <div class="col-md-6">
             <label class="form-label">Search</label>
             <input type="text" name="query" class="form-control" placeholder="Search for movies or books..." required />
         </div>
 
-        <!-- TYPE -->
         <div class="col-md-3">
             <label class="form-label">Type</label>
             <select name="type" id="typeSelect" class="form-select">
@@ -22,7 +19,6 @@
             </select>
         </div>
 
-        <!-- GENRE (Movies Only) -->
         <div class="col-md-3">
             <label class="form-label">Genre</label>
             <select name="genre" id="genreSelect" class="form-select">
@@ -30,13 +26,11 @@
             </select>
         </div>
 
-        <!-- YEAR -->
         <div class="col-md-3">
             <label class="form-label">Year</label>
             <input type="number" name="year" class="form-control" min="1900" max="2100" />
         </div>
 
-        <!-- MIN RATING -->
         <div class="col-md-3">
             <label class="form-label">Min Rating</label>
             <select name="minRating" class="form-select">
@@ -49,7 +43,6 @@
             </select>
         </div>
 
-        <!-- BUTTON -->
         <div class="col-md-3 d-flex align-items-end">
             <button class="btn btn-success w-100">Search & Apply Filters</button>
         </div>
@@ -57,14 +50,13 @@
 
     <hr />
 
-    <!-- TOP RATED -->
     <h2 class="mt-5">Top Rated</h2>
     <div class="row mt-3">
         @foreach (var item in Model.TopRated)
         {
             <div class="col-md-3 mb-4">
                 <div class="card shadow-sm h-100">
-                    <img src="@item.PosterUrl" class="card-img-top" />
+                    <img src="@item.PosterUrl" class="card-img-top" alt="Image couldn't be displayed"/>
 
                     <div class="card-body">
                         <strong>@item.Title (@(item.MediaType == "book" ? "Book" : "Movie"))</strong><br />
@@ -82,14 +74,13 @@
         }
     </div>
 
-    <!-- MOST POPULAR -->
     <h2 class="mt-5">Most Popular</h2>
     <div class="row mt-3">
         @foreach (var item in Model.MostPopular)
         {
             <div class="col-md-3 mb-4">
                 <div class="card shadow-sm h-100">
-                    <img src="@item.PosterUrl" class="card-img-top" />
+                    <img src="@item.PosterUrl" class="card-img-top" alt="Image couldn't be displayed"/>
 
                     <div class="card-body">
                         <strong>@item.Title</strong><br />
@@ -149,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function updateGenres() {
         let type = typeSelect.value;
-        genreSelect.innerHTML = ""; // Temizle
+        genreSelect.innerHTML = "";
 
         let defaultOption = document.createElement("option");
         defaultOption.value = "";
@@ -169,7 +160,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             bookGenres.forEach(name => {
                 let opt = document.createElement("option");
-                opt.value = name.toLowerCase();  // kitap filtresi string based
+                opt.value = name.toLowerCase();
                 opt.textContent = name;
                 genreSelect.appendChild(opt);
             });
@@ -177,10 +168,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // ilk load
     updateGenres();
 
-    // tür değişirse liste güncellenir
     typeSelect.addEventListener("change", updateGenres);
 
 });
