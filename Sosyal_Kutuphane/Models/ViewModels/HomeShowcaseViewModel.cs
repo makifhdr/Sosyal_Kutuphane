@@ -18,10 +18,4 @@
         public int PopularityScore =>
             ReviewCount + LibraryCount + CustomListCount;
     }
-
-    public class HomeShowcaseViewModel
-    {
-        public List<ShowcaseItemViewModel> TopRated { get; set; } = new();
-        public List<ShowcaseItemViewModel> MostPopular { get; set; } = new();
-    }
 }

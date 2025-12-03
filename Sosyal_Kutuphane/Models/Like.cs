@@ -6,8 +6,6 @@ public class Like
 
     public int UserId { get; set; }
 
-    // Activity türüne göre nullable alanlar
-    public int? RatingId { get; set; }
     public int? ReviewId { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -16,4 +16,5 @@ public class Review
     
     public List<ActivityLike> Likes { get; set; }
     public List<ActivityComment> Comments { get; set; }
+    
 }

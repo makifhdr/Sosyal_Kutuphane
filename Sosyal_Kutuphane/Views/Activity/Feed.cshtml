@@ -1,5 +1,5 @@
-﻿@using Sosyal_Kutuphane.Data
-@model Sosyal_Kutuphane.Models.ViewModels.PagedFeedViewModel
+﻿@model Sosyal_Kutuphane.Models.ViewModels.PagedFeedViewModel
+@Html.AntiForgeryToken()
 
 @{
     string DefaultAvatar = "/default-avatar.jpg";
@@ -107,30 +107,12 @@
 
             <!-- FOOTER (Likes + Comments) -->
             <div>
-                <form method="post" asp-controller="Activity" asp-action="ToggleLike" class="d-inline">
-                    @inject ApplicationDbContext _db
-                    @{
-                        
-                    }
-                    @if (a.ActivityType == "rating")
-                    {
-                        <input type="hidden" name="ratingId" value="@a.ActivityId"/>
-                    }
-                    else
-                    {
-                        <input type="hidden" name="reviewId" value="@a.ActivityId"/>
-                    }
-                    @if (a.IsLiked)
-                    {
-                        <button class="btn btn-danger btn-sm text-white">❤️ Like (@a.LikeCount)</button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-outline-primary btn-sm">
-                            ❤️ Like (@a.LikeCount)
-                        </button>
-                    }
-                </form>
+                <button type="button"
+                        class="btn btn-sm @(a.IsLiked ? "btn-danger text-white" : "btn-outline-primary") like-btn"
+                        data-id="@a.ActivityId"
+                        data-type="@a.ActivityType">
+                    ❤️ Like (@a.LikeCount)
+                </button>
 
                 <a class="btn btn-outline-secondary btn-sm"
                    href="/Activity/AddComment?activityId=@a.ActivityId&activityType=@a.ActivityType">
@@ -170,7 +152,7 @@
                                 @if (User.Identity.IsAuthenticated &&
                                      int.Parse(User.FindFirst("UserId")!.Value) == c.UserId)
                                 {
-                                    <form method="post" action="/Activity/DeleteComment" class="mt-1">
+                                    <form method="post" asp-controller="Activity" asp-action="DeleteComment" class="mt-1">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="id" value="@c.Id" />
                                         <button class="btn btn-sm btn-danger">Delete</button>
@@ -200,3 +182,43 @@ else
         No more activities.
     </div>
 }
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".like-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+
+                let activityId = btn.dataset.id;
+                let type = btn.dataset.type;
+
+                fetch("/Activity/ToggleLikeAjax", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "RequestVerificationToken": document.querySelector("input[name='__RequestVerificationToken']").value
+                    },
+                    body: JSON.stringify({
+                        activityId: activityId,
+                        activityType: type
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+
+                    if (data.success) {
+                        // Butonu güncelle
+                        if (data.isLiked) {
+                            btn.classList.remove("btn-outline-primary");
+                            btn.classList.add("btn-danger", "text-white");
+                        } else {
+                            btn.classList.add("btn-outline-primary");
+                            btn.classList.remove("btn-danger", "text-white");
+                        }
+
+                        btn.innerHTML = `❤️ Like (${data.likeCount})`;
+                    }
+                });
+            });
+        });
+    });
+</script>

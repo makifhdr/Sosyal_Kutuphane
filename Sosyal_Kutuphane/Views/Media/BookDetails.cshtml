@@ -2,12 +2,14 @@
 
 @model Newtonsoft.Json.Linq.JObject
 
+
 @{
     var info = Model["volumeInfo"];
     var title = info["title"];
     var authors = info["authors"];
     var desc = info["description"];
     var pageCount = info["pageCount"];
+    var genres = info["categories"];
     var image = info["imageLinks"]?["thumbnail"];
     
     string mediaId = Model["id"]?.ToString() ?? "";
@@ -20,6 +22,39 @@
     var userMedia = userId != null
         ? _db.UserMedia.FirstOrDefault(um => um.UserId == userId && um.MediaId == mediaId && um.MediaType == mediaType)
         : null;
+
+    var genreJTokenList = genres.ToList();
+
+    var genreList = genreJTokenList.Select(x => x.ToString());
+    
+    Console.WriteLine(string.Join(",", genreList));
+
+    string genreString = "";
+    
+    string[] bookGenres = [
+        "Fiction",
+        "Science Fiction",
+        "Fantasy",
+        "Romance",
+        "Thriller",
+        "Horror",
+        "Mystery",
+        "Biography",
+        "History",
+        "Children",
+        "Young Adult",
+        "Collectibles",
+        "Business",
+        "Technology",
+        "Engineering",
+        "Design"
+    ];
+
+    var intersectings = bookGenres.Where(genre =>
+        genreList.Any(x => x.Contains(genre))
+    );
+
+    genreString = string.Join(" ,", intersectings);
 }
 
 <div class="container mt-4">
@@ -69,6 +104,8 @@
 
             <p><strong>Author(s):</strong> @string.Join(", ", authors ?? new JArray())</p>
             <p><strong>Pages:</strong> @pageCount</p>
+            <p><strong>Genres:</strong> @genreString</p>
+            
             @if (ratingAverage != 0)
             {
                 <p>
@@ -84,75 +121,75 @@
         </div>
         
         <!-- Library Buttons -->
-            @if (User.Identity.IsAuthenticated)
-            {
-                <div>
-                    <!-- Read -->
-                    @if (userMedia != null && userMedia.Status == "read")
-                    {
-                        <form method="post" asp-controller="Media" asp-action="RemoveFromLibrary" class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="mediaId" value="@mediaId" />
-                            <input type="hidden" name="mediaType" value="@mediaType" />
-                            <button class="btn btn-danger">Remove from Read</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form method="post" asp-controller="Media" asp-action="AddToLibrary" class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="mediaId" value="@mediaId" />
-                            <input type="hidden" name="mediaType" value="@mediaType" />
-                            <input type="hidden" name="status" value="read" />
-                            <button class="btn btn-success">Mark as Read</button>
-                        </form>
-                    }
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div>
+                <!-- Read -->
+                @if (userMedia != null && userMedia.Status == "read")
+                {
+                    <form method="post" asp-controller="Media" asp-action="RemoveFromLibrary" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="mediaId" value="@mediaId" />
+                        <input type="hidden" name="mediaType" value="@mediaType" />
+                        <button class="btn btn-danger">Remove from 'Read'</button>
+                    </form>
+                }
+                else
+                {
+                    <form method="post" asp-controller="Media" asp-action="AddToLibrary" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="mediaId" value="@mediaId" />
+                        <input type="hidden" name="mediaType" value="@mediaType" />
+                        <input type="hidden" name="status" value="read" />
+                        <button class="btn btn-success">Add to 'Read'</button>
+                    </form>
+                }
 
-                    <!-- To Read -->
-                    @if (userMedia != null && userMedia.Status == "toread")
-                    {
-                        <form method="post" asp-controller="Media" asp-action="RemoveFromLibrary" class="d-inline ms-2">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="mediaId" value="@mediaId" />
-                            <input type="hidden" name="mediaType" value="@mediaType" />
-                            <button class="btn btn-outline-danger">Remove from To Read</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form method="post" asp-controller="Media" asp-action="AddToLibrary" class="d-inline ms-2">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="mediaId" value="@mediaId" />
-                            <input type="hidden" name="mediaType" value="@mediaType" />
-                            <input type="hidden" name="status" value="toread" />
-                            <button class="btn btn-outline-primary">Add to To Read</button>
-                        </form>
-                    }
-                </div>
+                <!-- To Read -->
+                @if (userMedia != null && userMedia.Status == "toread")
+                {
+                    <form method="post" asp-controller="Media" asp-action="RemoveFromLibrary" class="d-inline ms-2">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="mediaId" value="@mediaId" />
+                        <input type="hidden" name="mediaType" value="@mediaType" />
+                        <button class="btn btn-outline-danger">Remove from 'To Read'</button>
+                    </form>
+                }
+                else
+                {
+                    <form method="post" asp-controller="Media" asp-action="AddToLibrary" class="d-inline ms-2">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="mediaId" value="@mediaId" />
+                        <input type="hidden" name="mediaType" value="@mediaType" />
+                        <input type="hidden" name="status" value="toread" />
+                        <button class="btn btn-outline-primary">Add to 'To Read'</button>
+                    </form>
+                }
+            </div>
 
-                <!-- Custom List Add -->
-                <div class="mt-3">
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <a asp-controller="Media"
-                           asp-action="AddToCustomListPage"
-                           asp-route-mediaId="@mediaId"
-                           asp-route-mediaType="@mediaType"
-                           class="btn btn-outline-secondary mt-3">
-                            Add to Custom List
-                        </a>
-                    }
-                </div>
-            }
+            <!-- Custom List Add -->
+            <div class="mt-3">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Media"
+                       asp-action="AddToCustomListPage"
+                       asp-route-mediaId="@mediaId"
+                       asp-route-mediaType="@mediaType"
+                       class="btn btn-outline-secondary mt-3">
+                        Add to Custom List
+                    </a>
+                }
+            </div>
+        }
         
         @if (userRating != null)
         {
             <p><strong>Your rating:</strong> @userRating/10</p>
         }
         
-        <form method="post" action="/Activity/Rate">
+        <form method="post" asp-controller="Activity" asp-action="Rate">
             <input type="hidden" name="mediaId" value="@Model["id"]" />
-            <input type="hidden" name="mediaType" value="book" /> <!-- book için "book" -->
+            <input type="hidden" name="mediaType" value="book" />
     
             <label><strong>Give a new rating (1–10):</strong></label>
             <input type="number" name="score" min="1" max="10" class="form-control w-25" required />
@@ -160,7 +197,7 @@
             <button class="btn btn-primary mt-2">Submit Rating</button>
         </form>
         
-        <form method="post" action="/Activity/AddReview" class="mt-4">
+        <form method="post" asp-controller="Activity" asp-action="AddReview" class="mt-4">
             <input type="hidden" name="mediaId" value="@Model["id"]" />
             <input type="hidden" name="mediaType" value="book" />
 
@@ -173,9 +210,9 @@
         @inject ApplicationDbContext _db
         @using Microsoft.EntityFrameworkCore
         
-@using Microsoft.IdentityModel.Tokens
-@using Sosyal_Kutuphane.Data
-@{
+        @using Microsoft.IdentityModel.Tokens
+        @using Sosyal_Kutuphane.Data
+        @{
             var reviews = _db.Reviews
                 .Where(r => r.MediaId == mediaId && r.MediaType == mediaType)
                 .Include(r => r.User)
@@ -202,17 +239,27 @@
                         Posted @rev.CreatedAt.ToLocalTime().ToString("g")
                     </small>
 
-                    <form method="post" action="/Activity/ToggleLike">
-                        <input type="hidden" name="reviewId" value="@rev.Id" />
-                        <button class="btn btn-outline-primary">
-                            ❤️ Like (@_db.Likes.Count(l => l.ReviewId == rev.Id))
-                        </button>
-                    </form>
+                    @{
+                        var existing = _db.Likes
+                            .FirstOrDefault(l => l.UserId == userId && l.ReviewId == rev.Id);
+                        var isLiked = existing != null;
+                
+                        var likes = _db.Likes
+                            .Where(l => l.ReviewId == rev.Id).ToList();
+                    }
+                    
+                    <br/>
+                    <button type="button"
+                            class="btn btn-sm review-like-btn @(isLiked ? "btn-danger text-white" : "btn-outline-primary")"
+                            data-review-id="@rev.Id">
+
+                        ❤️ Like (@likes.Count)
+                    </button>
             
                     @if (User.Identity.IsAuthenticated && 
                          int.Parse(User.FindFirst("UserId")!.Value) == rev.UserId)
                     {
-                        <form method="post" action="/Activity/DeleteReview" class="d-inline">
+                        <form method="post" asp-controller="Activity" asp-action="DeleteReview" class="d-inline">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="reviewId" value="@rev.Id" />
                             <button class="btn btn-sm btn-danger">Delete</button>
@@ -226,3 +273,42 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    document.querySelectorAll(".review-like-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+
+            let reviewId = btn.dataset.reviewId;
+
+            fetch("/Activity/ToggleReviewLikeAjax/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ reviewId: reviewId })
+            })
+            .then(res => res.json())
+            .then(data => {
+
+                if (!data.success) return;
+
+                // renk değiştir
+                if (data.isLiked) {
+                    btn.classList.remove("btn-outline-primary");
+                    btn.classList.add("btn-danger", "text-white");
+                }
+                else {
+                    btn.classList.add("btn-outline-primary");
+                    btn.classList.remove("btn-danger", "text-white");
+                }
+
+                // like sayısını güncelle
+                btn.innerHTML = `❤️ Like (${data.likeCount})`;
+            });
+        });
+    });
+
+});
+</script>

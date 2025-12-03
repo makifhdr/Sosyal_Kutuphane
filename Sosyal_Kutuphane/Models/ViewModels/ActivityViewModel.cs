@@ -19,8 +19,6 @@
 
         public int LikeCount { get; set; }
         public int CommentCount { get; set; }
-
-        public bool UserLiked { get; set; }
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         

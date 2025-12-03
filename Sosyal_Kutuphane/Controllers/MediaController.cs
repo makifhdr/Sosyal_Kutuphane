@@ -115,25 +115,6 @@ public class MediaController : Controller
 
         return RedirectToAction("Details", "CustomList", new { id = listId });
     }
-
-    [Authorize]
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult RemoveFromCustomList(int listId, string mediaId, string mediaType)
-    {
-        var userId = int.Parse(User.FindFirst("UserId").Value);
-        var list = _db.CustomList.FirstOrDefault(l => l.Id == listId && l.UserId == userId);
-        if (list == null) return Forbid();
-
-        var item = _db.CustomListItem.FirstOrDefault(i => i.CustomListId == listId && i.MediaId == mediaId && i.MediaType == mediaType);
-        if (item != null)
-        {
-            _db.CustomListItem.Remove(item);
-            _db.SaveChanges();
-        }
-
-        return Redirect(Request.Headers["Referer"].ToString());
-    }
     
     [HttpGet]
     public IActionResult AddToCustomListPage(string mediaId, string mediaType)

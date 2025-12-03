@@ -16,7 +16,7 @@
         <!-- TYPE -->
         <div class="col-md-3">
             <label class="form-label">Type</label>
-            <select name="type" class="form-select">
+            <select name="type" id="typeSelect" class="form-select">
                 <option value="movie">Movies</option>
                 <option value="book">Books</option>
             </select>
@@ -25,18 +25,8 @@
         <!-- GENRE (Movies Only) -->
         <div class="col-md-3">
             <label class="form-label">Genre</label>
-            <select name="genre" class="form-select">
+            <select name="genre" id="genreSelect" class="form-select">
                 <option value="">Any</option>
-                <option value="28">Action</option>
-                <option value="12">Adventure</option>
-                <option value="16">Animation</option>
-                <option value="35">Comedy</option>
-                <option value="80">Crime</option>
-                <option value="18">Drama</option>
-                <option value="14">Fantasy</option>
-                <option value="27">Horror</option>
-                <option value="10749">Romance</option>
-                <option value="878">Sci-Fi</option>
             </select>
         </div>
 
@@ -118,3 +108,80 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const typeSelect = document.getElementById("typeSelect");
+    const genreSelect = document.getElementById("genreSelect");
+
+    const movieGenres = [
+        { id: "28", name: "Action" },
+        { id: "12", name: "Adventure" },
+        { id: "16", name: "Animation" },
+        { id: "35", name: "Comedy" },
+        { id: "80", name: "Crime" },
+        { id: "18", name: "Drama" },
+        { id: "14", name: "Fantasy" },
+        { id: "27", name: "Horror" },
+        { id: "10749", name: "Romance" },
+        { id: "878", name: "Sci-Fi" }
+    ];
+
+    const bookGenres = [
+        "Fiction",
+        "Science Fiction",
+        "Fantasy",
+        "Romance",
+        "Thriller",
+        "Horror",
+        "Mystery",
+        "Biography",
+        "History",
+        "Children",
+        "Young Adult",
+        "Collectibles",
+        "Business",
+        "Technology",
+        "Engineering",
+        "Design"
+    ];
+
+    function updateGenres() {
+        let type = typeSelect.value;
+        genreSelect.innerHTML = ""; // Temizle
+
+        let defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Any";
+        genreSelect.appendChild(defaultOption);
+
+        if (type === "movie") {
+
+            movieGenres.forEach(g => {
+                let opt = document.createElement("option");
+                opt.value = g.id;
+                opt.textContent = g.name;
+                genreSelect.appendChild(opt);
+            });
+
+        } else if (type === "book") {
+
+            bookGenres.forEach(name => {
+                let opt = document.createElement("option");
+                opt.value = name.toLowerCase();  // kitap filtresi string based
+                opt.textContent = name;
+                genreSelect.appendChild(opt);
+            });
+
+        }
+    }
+
+    // ilk load
+    updateGenres();
+
+    // tür değişirse liste güncellenir
+    typeSelect.addEventListener("change", updateGenres);
+
+});
+</script>

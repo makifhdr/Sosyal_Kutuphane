@@ -141,7 +141,7 @@
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="mediaId" value="@mediaId" />
                             <input type="hidden" name="mediaType" value="@mediaType" />
-                            <button class="btn btn-danger">Remove from Watched</button>
+                            <button class="btn btn-danger">Remove from 'Watched'</button>
                         </form>
                     }
                     else
@@ -151,7 +151,7 @@
                             <input type="hidden" name="mediaId" value="@mediaId" />
                             <input type="hidden" name="mediaType" value="@mediaType" />
                             <input type="hidden" name="status" value="watched" />
-                            <button class="btn btn-success">Mark as Watched</button>
+                            <button class="btn btn-success">Add to 'Watched'</button>
                         </form>
                     }
 
@@ -162,7 +162,7 @@
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="mediaId" value="@mediaId" />
                             <input type="hidden" name="mediaType" value="@mediaType" />
-                            <button class="btn btn-outline-danger">Remove from To Watch</button>
+                            <button class="btn btn-outline-danger">Remove from 'To Watch'</button>
                         </form>
                     }
                     else
@@ -172,7 +172,7 @@
                             <input type="hidden" name="mediaId" value="@mediaId" />
                             <input type="hidden" name="mediaType" value="@mediaType" />
                             <input type="hidden" name="status" value="towatch" />
-                            <button class="btn btn-outline-primary">Add to To Watch</button>
+                            <button class="btn btn-outline-primary">Add to 'To Watch'</button>
                         </form>
                     }
                 </div>
@@ -199,18 +199,17 @@
             {
                 <p><strong>Your rating:</strong> @userRating/10</p>
             }
-
-            <form method="post" action="/Activity/Rate">
+<form method="post" asp-controller="Activity" asp-action="Rate">
     <input type="hidden" name="mediaId" value="@Model["id"]" />
     <input type="hidden" name="mediaType" value="movie" />
-    
+                
     <label><strong>Give a new rating (1–10):</strong></label>
     <input type="number" name="score" min="1" max="10" class="form-control w-25" required />
 
     <button class="btn btn-primary mt-2">Submit Rating</button>
 </form>
 
-<form method="post" action="/Activity/AddReview" class="mt-4">
+<form method="post" asp-controller="Activity" asp-action="AddReview" class="mt-4">
     <input type="hidden" name="mediaId" value="@Model["id"]" />
     <input type="hidden" name="mediaType" value="movie" /> <!-- veya book -->
 
@@ -248,13 +247,22 @@
             <small class="text-muted">
                 Posted @rev.CreatedAt.ToLocalTime().ToString("g")
             </small>
+            
+            @{
+                var existing = _db.Likes
+                    .FirstOrDefault(l => l.UserId == userId && l.ReviewId == rev.Id);
+                var isLiked = existing != null;
+                
+                var likes = _db.Likes
+                    .Where(l => l.ReviewId == rev.Id).ToList();
+            }
+            <br/>
+            <button type="button"
+                    class="btn btn-sm review-like-btn @(isLiked ? "btn-danger text-white" : "btn-outline-primary")"
+                    data-review-id="@rev.Id">
 
-            <form method="post" action="/Activity/ToggleLike">
-                <input type="hidden" name="reviewId" value="@rev.Id" />
-                <button class="btn btn-outline-primary">
-                    ❤️ Like (@_db.Likes.Count(l => l.ReviewId == rev.Id))
-                </button>
-            </form>
+                ❤️ Like (@likes.Count)
+            </button>
             
             @if (User.Identity.IsAuthenticated && 
                  int.Parse(User.FindFirst("UserId")!.Value) == rev.UserId)
@@ -269,3 +277,42 @@
         </div>
     </div>
 }
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    document.querySelectorAll(".review-like-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+
+            let reviewId = btn.dataset.reviewId;
+
+            fetch("/Activity/ToggleReviewLikeAjax", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ reviewId: reviewId })
+            })
+            .then(res => res.json())
+            .then(data => {
+
+                if (!data.success) return;
+
+                // renk değiştir
+                if (data.isLiked) {
+                    btn.classList.remove("btn-outline-primary");
+                    btn.classList.add("btn-danger", "text-white");
+                }
+                else {
+                    btn.classList.add("btn-outline-primary");
+                    btn.classList.remove("btn-danger", "text-white");
+                }
+
+                // like sayısını güncelle
+                btn.innerHTML = `❤️ Like (${data.likeCount})`;
+            });
+        });
+    });
+
+});
+</script>

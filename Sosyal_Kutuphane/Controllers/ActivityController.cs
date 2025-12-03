@@ -45,32 +45,99 @@ public class ActivityController : Controller
         return Redirect(Request.Headers["Referer"].ToString());
     }
     
-    [HttpPost]
-    public IActionResult ToggleLike(int? ratingId, int? reviewId)
+    public class LikeRequest
     {
-        var userId = int.Parse(User.FindFirst("UserId").Value);
+        public int ActivityId { get; set; }
+        public string ActivityType { get; set; }
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult ToggleLikeAjax([FromBody] LikeRequest req)
+    {
+        int userId = int.Parse(User.FindFirst("UserId").Value);
 
-        var existing = _db.ActivityLike
-            .FirstOrDefault(l => l.UserId == userId 
-                                 && l.RatingId == ratingId 
-                                 && l.ReviewId == reviewId);
+        ActivityLike like;
 
-        if (existing != null)
+        if (req.ActivityType == "rating")
+            like = _db.ActivityLike.FirstOrDefault(x => x.UserId == userId && x.RatingId == req.ActivityId);
+        else
+            like = _db.ActivityLike.FirstOrDefault(x => x.UserId == userId && x.ReviewId == req.ActivityId);
+
+        bool isLiked = false;
+
+        if (like != null)
         {
-            _db.ActivityLike.Remove(existing);
+            _db.ActivityLike.Remove(like);
+            isLiked = false;
         }
         else
         {
             _db.ActivityLike.Add(new ActivityLike
             {
                 UserId = userId,
-                RatingId = ratingId,
-                ReviewId = reviewId
+                RatingId = req.ActivityType == "rating" ? req.ActivityId : null,
+                ReviewId = req.ActivityType == "review" ? req.ActivityId : null
             });
+
+            isLiked = true;
         }
 
         _db.SaveChanges();
-        return Redirect(Request.Headers["Referer"]);
+
+        int likeCount = _db.ActivityLike.Count(l =>
+            (req.ActivityType == "rating" && l.RatingId == req.ActivityId) ||
+            (req.ActivityType == "review" && l.ReviewId == req.ActivityId)
+        );
+
+        return Json(new
+        {
+            success = true,
+            likeCount,
+            isLiked
+        });
+    }
+    
+    [HttpPost]
+    public IActionResult ToggleReviewLikeAjax([FromBody] ReviewLikeRequest req)
+    {
+        int userId = int.Parse(User.FindFirst("UserId").Value);
+
+        var existing = _db.Likes
+            .FirstOrDefault(l => l.UserId == userId && l.ReviewId == req.ReviewId);
+
+        bool isLiked;
+
+        if (existing != null)
+        {
+            _db.Likes.Remove(existing);
+            isLiked = false;
+        }
+        else
+        {
+            _db.Likes.Add(new Like
+            {
+                UserId = userId,
+                ReviewId = req.ReviewId
+            });
+            isLiked = true;
+        }
+
+        _db.SaveChanges();
+
+        int likeCount = _db.Likes.Count(l => l.ReviewId == req.ReviewId);
+
+        return Json(new
+        {
+            success = true,
+            isLiked,
+            likeCount
+        });
+    }
+
+    public class ReviewLikeRequest
+    {
+        public int ReviewId { get; set; }
     }
     
     [HttpGet]
@@ -195,7 +262,7 @@ public class ActivityController : Controller
     }
     
     [Authorize]
-    public async Task<IActionResult> Feed(int page = 1, int pageSize = 15)
+    public async Task<IActionResult> Feed(int page = 1, int pageSize = 10)
     {
         var currentUserId = int.Parse(User.FindFirst("UserId").Value);
 
@@ -205,10 +272,10 @@ public class ActivityController : Controller
             .Select(f => f.FollowingId)
             .ToListAsync();
 
-        if (!followingIds.Any())
+        if (followingIds.Count == 0)
         {
             // Takip edilen yoksa boş liste döndür
-            return View(new List<ActivityViewModel>());
+            return View(new PagedFeedViewModel());
         }
 
         // 2) Ratings ve Reviews'leri ayrı ayrı çek (User nav ile)
@@ -297,12 +364,8 @@ public class ActivityController : Controller
             var userId = int.Parse(User.FindFirst("UserId").Value);
             
             var liked = _db.ActivityLike.Any(l =>
-                l.UserId == userId &&
-                (l.RatingId == r.Id ||
-                 l.ReviewId == r.Id)
+                l.UserId == userId && l.RatingId == r.Id
             );
-            
-            
             
             activities.Add(new ActivityViewModel
             {
@@ -342,9 +405,7 @@ public class ActivityController : Controller
             var userId = int.Parse(User.FindFirst("UserId").Value);
             
             var liked = _db.ActivityLike.Any(l =>
-                l.UserId == userId &&
-                (l.RatingId == rv.Id ||
-                 l.ReviewId == rv.Id)
+                l.UserId == userId && l.ReviewId == rv.Id
             );
             
             activities.Add(new ActivityViewModel

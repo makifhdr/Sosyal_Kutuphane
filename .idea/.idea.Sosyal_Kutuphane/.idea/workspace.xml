@@ -7,10 +7,18 @@
   <component name="ChangeListManager">
     <list default="true" id="773391db-e371-424b-8594-2944395ca537" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Sosyal_Kutuphane/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Sosyal_Kutuphane/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/HomeController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Home/Index.cshtml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Search/BookResults.cshtml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Search/MovieResults.cshtml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/ActivityController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/ActivityController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/MediaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/MediaController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/SearchController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Controllers/SearchController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Like.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Like.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Review.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/Review.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/User.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ActivityViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/ActivityViewModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/HomeShowcaseViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Models/ViewModels/HomeShowcaseViewModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Activity/Feed.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Activity/Feed.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/BookDetails.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/BookDetails.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/MovieDetails.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Media/MovieDetails.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Search/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Sosyal_Kutuphane/Views/Search/Index.cshtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,6 +141,8 @@
       <workItem from="1764407877465" duration="11483000" />
       <workItem from="1764493097763" duration="9766000" />
       <workItem from="1764578820644" duration="8272000" />
+      <workItem from="1764683991147" duration="3438000" />
+      <workItem from="1764689451071" duration="9995000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -150,7 +160,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764601644836</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Deleting unused files">
+      <option name="closed" value="true" />
+      <created>1764684102392</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1764684102392</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -173,7 +191,8 @@
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Initial commit" />
     <MESSAGE value="Major additions; Home feed with user activities, likes and comments on activities, filtered search etc." />
-    <option name="LAST_COMMIT_MESSAGE" value="Major additions; Home feed with user activities, likes and comments on activities, filtered search etc." />
+    <MESSAGE value="Deleting unused files" />
+    <option name="LAST_COMMIT_MESSAGE" value="Deleting unused files" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

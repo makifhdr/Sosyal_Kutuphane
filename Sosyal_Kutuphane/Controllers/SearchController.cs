@@ -292,6 +292,19 @@ public class SearchController : Controller
             var books = booksData["items"]?
                 .Select(i => (JObject)i)
                 .ToList() ?? new List<JObject>();
+            
+            if (!string.IsNullOrEmpty(genre))
+            {
+                books = books.Where(b =>
+                {
+                    var cats = b["volumeInfo"]?["categories"];
+                    if (cats == null) return false;
+
+                    return cats.Any(c =>
+                        c.ToString().ToLower().Contains(genre.ToLower())
+                    );
+                }).ToList();
+            }
 
             // year filtresi örneği
             if (year != null)
