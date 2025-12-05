@@ -57,7 +57,7 @@
                          class="rounded me-3 shadow-sm"
                          alt="Image couldn't be displayed"/>
 
-                    <div>
+                    <div style="flex: 1; min-width: 0;">
 
                         <h5>
                             <a href="/Media/@(a.MediaType == "movie" ? "MovieDetails" : "BookDetails")/@a.MediaId"
@@ -97,9 +97,12 @@
                             <p class="mt-2">
                                 @a.ReviewExcerpt
 
-                                <a href="/Media/@(a.MediaType == "movie" ? "MovieDetails" : "BookDetails")/@a.MediaId#reviews">
-                                    more...
-                                </a>
+                                @if (a.ReviewExcerpt.Length > 200)
+                                {
+                                    <a href="/Media/@(a.MediaType == "movie" ? "MovieDetails" : "BookDetails")/@a.MediaId#reviews">
+                                        read more...
+                                    </a>
+                                }
                             </p>
                         }
 

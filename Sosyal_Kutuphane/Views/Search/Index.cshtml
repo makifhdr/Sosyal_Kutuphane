@@ -1,4 +1,5 @@
-﻿@model Sosyal_Kutuphane.Models.ViewModels.ExploreViewModel
+﻿@using Microsoft.IdentityModel.Tokens
+@model Sosyal_Kutuphane.Models.ViewModels.ExploreViewModel
 
 <div class="container mt-4">
 
@@ -52,48 +53,74 @@
 
     <h2 class="mt-5">Top Rated</h2>
     <div class="row mt-3">
-        @foreach (var item in Model.TopRated)
+        @{
+            var topRated = Model.TopRated;
+        }
+        
+        @if (!topRated.IsNullOrEmpty())
         {
-            <div class="col-md-3 mb-4">
-                <div class="card shadow-sm h-100">
-                    <img src="@item.PosterUrl" class="card-img-top" alt="Image couldn't be displayed"/>
+            foreach (var item in topRated)
+                {
+                    <div class="col-md-3 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <img src="@item.PosterUrl" class="card-img-top" alt="Image couldn't be displayed"/>
 
-                    <div class="card-body">
-                        <strong>@item.Title (@(item.MediaType == "book" ? "Book" : "Movie"))</strong><br />
-                        <small>⭐ @item.AverageRating/10 (@item.RatingCount ratings)</small>
-                    </div>
+                            <div class="card-body">
+                                <strong>@item.Title (@(item.MediaType == "book" ? "Book" : "Movie"))</strong><br/>
+                                <small>⭐ @item.AverageRating/10 (@item.RatingCount ratings)</small>
+                            </div>
 
-                    <div class="card-footer bg-white border-0">
-                        <a class="btn btn-primary w-100"
-                           href="/Media/@(item.MediaType == "movie" ? "MovieDetails" : "BookDetails")/@item.MediaId">
-                            Details
-                        </a>
+                            <div class="card-footer bg-white border-0">
+                                <a class="btn btn-primary w-100"
+                                   href="/Media/@(item.MediaType == "movie" ? "MovieDetails" : "BookDetails")/@item.MediaId">
+                                    Details
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                }
+        }
+        else
+        {
+            <div class="text-center text-muted mt-3">
+                No item found.
             </div>
         }
     </div>
 
     <h2 class="mt-5">Most Popular</h2>
     <div class="row mt-3">
-        @foreach (var item in Model.MostPopular)
+        @{
+            var mostPopular = Model.MostPopular;
+        }
+        
+        @if (mostPopular.Count != 0)
         {
-            <div class="col-md-3 mb-4">
-                <div class="card shadow-sm h-100">
-                    <img src="@item.PosterUrl" class="card-img-top" alt="Image couldn't be displayed"/>
+            @foreach (var item in Model.MostPopular)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <img src="@item.PosterUrl" class="card-img-top" alt="Image couldn't be displayed"/>
 
-                    <div class="card-body">
-                        <strong>@item.Title</strong><br />
-                        <small>🔥 Popularity: @item.PopularityScore</small>
-                    </div>
+                        <div class="card-body">
+                            <strong>@item.Title</strong><br/>
+                            <small>🔥 Popularity: @item.PopularityScore</small>
+                        </div>
 
-                    <div class="card-footer bg-white border-0">
-                        <a class="btn btn-outline-primary w-100"
-                           href="/Media/@(item.MediaType == "movie" ? "MovieDetails" : "BookDetails")/@item.MediaId">
-                            View
-                        </a>
+                        <div class="card-footer bg-white border-0">
+                            <a class="btn btn-outline-primary w-100"
+                               href="/Media/@(item.MediaType == "movie" ? "MovieDetails" : "BookDetails")/@item.MediaId">
+                                View
+                            </a>
+                        </div>
                     </div>
                 </div>
+            }
+        }
+        else
+        {
+            <div class="text-center text-muted mt-3">
+                No item found.
             </div>
         }
     </div>

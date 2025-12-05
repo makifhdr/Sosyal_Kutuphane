@@ -16,7 +16,7 @@
                     @{
                         string avatar = Model.Avatar != null
                             ? $"data:image/png;base64,{Convert.ToBase64String(Model.Avatar)}"
-                            : "/avatars/default.png";
+                            : "/default-avatar.jpg";
                     }
                     <img src="@avatar"
                          class="rounded-circle border"

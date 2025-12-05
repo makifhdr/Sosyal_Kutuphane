@@ -29,7 +29,8 @@ public class SearchController : Controller
             TopRated = await GetTopRatedAsync(12),
             MostPopular = await GetMostPopularAsync(12)
         };
-
+        
+        
         return View(vm);
     }
     
@@ -130,14 +131,22 @@ public class SearchController : Controller
             })
             .ToListAsync();
         
-        var items = popularity
-            .Select(p => new
+        // 🔥 ÖNEMLİ: Tüm kaynaklardan birleşik unique medya listesi
+        var allMedia = popularity
+            .Select(x => new { x.MediaId, x.MediaType })
+            .Union(libStats.Select(x => new { x.MediaId, x.MediaType }))
+            .Union(listStats.Select(x => new { x.MediaId, x.MediaType }))
+            .Distinct()
+            .ToList();
+        
+        var items = allMedia
+            .Select(m => new
             {
-                p.MediaId,
-                p.MediaType,
-                p.ReviewCount,
-                LibraryCount = libStats.FirstOrDefault(x => x.MediaId == p.MediaId && x.MediaType == p.MediaType)?.LibraryCount ?? 0,
-                CustomListCount = listStats.FirstOrDefault(x => x.MediaId == p.MediaId && x.MediaType == p.MediaType)?.CustomListCount ?? 0
+                m.MediaId,
+                m.MediaType,
+                ReviewCount = popularity.FirstOrDefault(x => x.MediaId == m.MediaId && x.MediaType == m.MediaType)?.ReviewCount ?? 0,
+                LibraryCount = libStats.FirstOrDefault(x => x.MediaId == m.MediaId && x.MediaType == m.MediaType)?.LibraryCount ?? 0,
+                CustomListCount = listStats.FirstOrDefault(x => x.MediaId == m.MediaId && x.MediaType == m.MediaType)?.CustomListCount ?? 0
             })
             .Select(x => new
             {
@@ -161,11 +170,12 @@ public class SearchController : Controller
 
             if (g.MediaType == "movie")
             {
-                JObject movie = await _tmdb.GetMovieDetails(g.MediaId);
-                title = movie["title"]?.ToString() ?? "Unknown movie";
-                poster = movie["poster_path"] != null
-                    ? $"https://image.tmdb.org/t/p/w342{movie["poster_path"]}"
-                    : "/images/no-poster.png";
+                    JObject movie = await _tmdb.GetMovieDetails(g.MediaId);
+                    title = movie["title"]?.ToString() ?? "Unknown movie";
+                    poster = movie["poster_path"] != null
+                        ? $"https://image.tmdb.org/t/p/w342{movie["poster_path"]}"
+                        : "/images/no-poster.png";
+                
             }
             else
             {
@@ -175,34 +185,18 @@ public class SearchController : Controller
                     ?? "/images/no-cover.png";
             }
 
-            var allRatings = _db.Ratings
-                .Where(r => r.MediaId == g.MediaId && r.MediaType == g.MediaType)
-                .Select(r => (double?)r.Score).ToList()
-                .DefaultIfEmpty(null);
-
-            double? sum = 0.0;
-
-            foreach (var r in allRatings)
-            {
-                sum += r;
-            }
-            
-            var avgRating = sum/allRatings.Count();
-
             results.Add(new ShowcaseItemViewModel
             {
                 MediaId = g.MediaId,
                 MediaType = g.MediaType,
                 Title = title,
                 PosterUrl = poster,
-                AverageRating = avgRating != null ? Math.Round(avgRating.Value, 1) : null,
                 RatingCount = await _db.Ratings.CountAsync(r => r.MediaId == g.MediaId && r.MediaType == g.MediaType),
                 ReviewCount = g.ReviewCount,
                 LibraryCount = g.LibraryCount,
                 CustomListCount = g.CustomListCount
             });
         }
-
         return results;
     }
     
